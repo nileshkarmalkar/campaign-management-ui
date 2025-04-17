@@ -137,7 +137,6 @@ const Segments = () => {
                   </IconButton>
                 </Box>
                 <Typography>Description: {segment.description}</Typography>
-                <Typography>Estimated Size: {segment.estimatedSize}</Typography>
                 <Typography>Refresh Frequency: {segment.refreshFrequency}</Typography>
                 <Typography style={{ color: getStatusColor(segment.status) }}>
                   Status: {segment.status}
@@ -148,7 +147,23 @@ const Segments = () => {
                 <Typography>Account Sub-type: {segment.accountSubType.join(', ')}</Typography>
                 <Typography>Number of Subscribers: {segment.numberOfSubscribers}</Typography>
                 <Typography>Geography: {segment.geography.join(', ')}</Typography>
-                <Typography>MSF Amount: ${segment.msfAmount}</Typography>
+                <Typography>
+                  MSF Amount: {(() => {
+                    const { operator, value1, value2 } = segment.msfAmount;
+                    switch (operator) {
+                      case '>=':
+                        return `≥ $${value1}`;
+                      case '<=':
+                        return `≤ $${value1}`;
+                      case '=':
+                        return `= $${value1}`;
+                      case 'between':
+                        return `$${value1} - $${value2}`;
+                      default:
+                        return 'Not specified';
+                    }
+                  })()}
+                </Typography>
                 <Typography>Triggers: {segment.triggers.map(t => triggers.find(trigger => trigger.id === t)?.triggerName).join(', ')}</Typography>
                 <Typography>Existing Segments: {segment.existingSegments.map(s => segments.find(seg => seg.id === s)?.segmentName).join(', ')}</Typography>
               </Paper>

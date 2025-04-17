@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput } from '@mui/material';
+import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment } from '@mui/material';
 
 const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
   const [formData, setFormData] = useState(
@@ -7,7 +7,6 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
       segmentName: '',
       description: '',
       status: 'active',
-      estimatedSize: '',
       source: '',
       refreshFrequency: 'daily',
       brand: [],
@@ -16,7 +15,11 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
       accountSubType: [],
       numberOfSubscribers: '',
       geography: [],
-      msfAmount: '',
+      msfAmount: {
+        operator: '>=',
+        value1: '',
+        value2: ''
+      },
       triggers: [],
       existingSegments: []
     }
@@ -24,7 +27,15 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    if (name.startsWith('msfAmount.')) {
+      const [, field] = name.split('.');
+      setFormData({
+        ...formData,
+        msfAmount: { ...formData.msfAmount, [field]: value }
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = (event) => {
@@ -172,26 +183,52 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="MSF amount"
-            name="msfAmount"
-            type="number"
-            value={formData.msfAmount}
-            onChange={handleChange}
-            helperText="Enter a positive dollar amount"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Estimated Size"
-            name="estimatedSize"
-            type="number"
-            value={formData.estimatedSize}
-            onChange={handleChange}
-            required
-          />
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>MSF Amount Operator</InputLabel>
+                <Select
+                  name="msfAmount.operator"
+                  value={formData.msfAmount.operator}
+                  onChange={handleChange}
+                  input={<OutlinedInput label="MSF Amount Operator" />}
+                >
+                  <MenuItem value=">=">Greater than or equal to</MenuItem>
+                  <MenuItem value="<=">Less than or equal to</MenuItem>
+                  <MenuItem value="between">Between</MenuItem>
+                  <MenuItem value="=">Equal to</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={formData.msfAmount.operator === 'between' ? 6 : 12}>
+              <TextField
+                fullWidth
+                label={formData.msfAmount.operator === 'between' ? "From Amount" : "Amount"}
+                name="msfAmount.value1"
+                type="number"
+                value={formData.msfAmount.value1}
+                onChange={handleChange}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">$</InputAdornment>
+                }}
+              />
+            </Grid>
+            {formData.msfAmount.operator === 'between' && (
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="To Amount"
+                  name="msfAmount.value2"
+                  type="number"
+                  value={formData.msfAmount.value2}
+                  onChange={handleChange}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>
+                  }}
+                />
+              </Grid>
+            )}
+          </Grid>
         </Grid>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
@@ -236,7 +273,7 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required>
+          <FormControl fullWidth>
             <InputLabel>Refresh Frequency</InputLabel>
             <Select
               name="refreshFrequency"

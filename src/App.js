@@ -1,24 +1,47 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import Layout from './components/layout/Layout';
+import Campaigns from './components/campaigns/Campaigns';
+import Segments from './components/segments/Segments';
+import Offers from './components/offers/Offers';
+import Communications from './components/communications/Communications';
 import './App.css';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+    background: {
+      default: '#f5f5f5',
+    },
+  },
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/campaigns" element={<Campaigns />} />
+            <Route path="/segments" element={<Segments />} />
+            <Route path="/offers" element={<Offers />} />
+            <Route path="/communications" element={<Communications />} />
+            <Route path="/" element={<Navigate to="/campaigns" replace />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+      </ThemeProvider>
+    </LocalizationProvider>
   );
 }
 

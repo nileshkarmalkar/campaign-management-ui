@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/campaign-management-ui/static/css/main.df0dc1f7.css",
+    "main.js": "/campaign-management-ui/static/js/main.6e230f69.js",
+    "static/js/453.88cddbf3.chunk.js": "/campaign-management-ui/static/js/453.88cddbf3.chunk.js",
+    "index.html": "/campaign-management-ui/index.html",
+    "main.df0dc1f7.css.map": "/campaign-management-ui/static/css/main.df0dc1f7.css.map",
+    "main.6e230f69.js.map": "/campaign-management-ui/static/js/main.6e230f69.js.map",
+    "453.88cddbf3.chunk.js.map": "/campaign-management-ui/static/js/453.88cddbf3.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.df0dc1f7.css",
+    "static/js/main.6e230f69.js"
+  ]
+}

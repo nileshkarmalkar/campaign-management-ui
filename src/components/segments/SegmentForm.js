@@ -238,12 +238,12 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
               value={formData.triggers}
               onChange={handleChange}
               input={<OutlinedInput label="Triggers" />}
-              renderValue={(selected) => selected.join(', ')}
+              renderValue={(selected) => selected.map(id => availableTriggers.find(t => t.id === id)?.triggerName).join(', ')}
             >
               {availableTriggers.map((trigger) => (
                 <MenuItem key={trigger.id} value={trigger.id}>
                   <Checkbox checked={formData.triggers.indexOf(trigger.id) > -1} />
-                  <ListItemText primary={trigger.triggerName} />
+                  <ListItemText primary={`${trigger.triggerName} (${trigger.type})`} />
                 </MenuItem>
               ))}
             </Select>

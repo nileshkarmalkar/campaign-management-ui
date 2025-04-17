@@ -1,15 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
 import TriggerForm from './TriggerForm';
 
 const Triggers = () => {
   const [showForm, setShowForm] = useState(false);
-  const { triggers, addTrigger, campaigns, mapTriggerToCampaign } = useAppContext();
+  const { triggers, addTrigger, updateTrigger, campaigns, mapTriggerToCampaign } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('triggerName');
   const [showMapDialog, setShowMapDialog] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [selectedTrigger, setSelectedTrigger] = useState(null);
   const [selectedCampaign, setSelectedCampaign] = useState('');
 
@@ -39,8 +41,24 @@ const Triggers = () => {
   };
 
   const handleSubmitForm = (formData) => {
-    addTrigger(formData);
-    setShowForm(false);
+    if (selectedTrigger) {
+      updateTrigger({ ...formData, id: selectedTrigger.id, mappedCampaignId: selectedTrigger.mappedCampaignId });
+      setShowEditForm(false);
+      setSelectedTrigger(null);
+    } else {
+      addTrigger(formData);
+      setShowForm(false);
+    }
+  };
+
+  const handleEditTrigger = (trigger) => {
+    setSelectedTrigger(trigger);
+    setShowEditForm(true);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditForm(false);
+    setSelectedTrigger(null);
   };
 
   const handleMapTrigger = (trigger) => {
@@ -109,16 +127,25 @@ const Triggers = () => {
           Add New Trigger
         </Button>
       )}
-      {showForm ? (
+      {showForm || showEditForm ? (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
-          <TriggerForm onSubmit={handleSubmitForm} onCancel={handleCancelForm} />
+          <TriggerForm 
+            onSubmit={handleSubmitForm} 
+            onCancel={showEditForm ? handleCancelEdit : handleCancelForm}
+            initialData={selectedTrigger}
+          />
         </Paper>
       ) : (
         <Grid container spacing={3}>
           {filteredTriggers.map((trigger) => (
             <Grid item xs={12} key={trigger.id}>
               <Paper style={{ padding: '20px' }}>
-                <Typography variant="h6">{trigger.triggerName}</Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="h6">{trigger.triggerName}</Typography>
+                  <IconButton onClick={() => handleEditTrigger(trigger)} color="primary">
+                    <EditIcon />
+                  </IconButton>
+                </Box>
                 <Typography>Type: {trigger.type}</Typography>
                 <Typography>Status: {trigger.status}</Typography>
                 <Typography>Mapped Campaign: {getMappedCampaignName(trigger)}</Typography>

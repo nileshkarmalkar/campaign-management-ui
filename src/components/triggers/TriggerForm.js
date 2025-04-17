@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Paper } from '@mui/material';
 
-const TriggerForm = ({ onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    triggerName: '',
-    description: '',
-    type: '',
-    condition: '',
-    status: 'active'
-  });
+const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
+  const [formData, setFormData] = useState(
+    initialData || {
+      triggerName: '',
+      description: '',
+      type: '',
+      condition: '',
+      status: 'active'
+    }
+  );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -86,7 +88,7 @@ const TriggerForm = ({ onSubmit, onCancel }) => {
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary">
-            Submit
+            {initialData ? 'Update' : 'Submit'}
           </Button>
           <Button onClick={onCancel} variant="outlined" style={{ marginLeft: '10px' }}>
             Cancel

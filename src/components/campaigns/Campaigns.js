@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
 import CampaignForm from './CampaignForm';
 import { format } from 'date-fns';
 
@@ -11,6 +12,7 @@ const Campaigns = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('campaignName');
   const [showMapDialog, setShowMapDialog] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [selectedTriggers, setSelectedTriggers] = useState([]);
 
@@ -40,8 +42,24 @@ const Campaigns = () => {
   };
 
   const handleSubmitForm = (formData) => {
-    addCampaign(formData);
-    setShowForm(false);
+    if (selectedCampaign) {
+      updateCampaign({ ...formData, id: selectedCampaign.id, mappedTriggers: selectedCampaign.mappedTriggers });
+      setShowEditForm(false);
+      setSelectedCampaign(null);
+    } else {
+      addCampaign(formData);
+      setShowForm(false);
+    }
+  };
+
+  const handleEditCampaign = (campaign) => {
+    setSelectedCampaign(campaign);
+    setShowEditForm(true);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditForm(false);
+    setSelectedCampaign(null);
   };
 
   const handleMapTriggers = (campaign) => {
@@ -116,16 +134,25 @@ const Campaigns = () => {
           Add New Campaign
         </Button>
       )}
-      {showForm ? (
+      {showForm || showEditForm ? (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
-          <CampaignForm onSubmit={handleSubmitForm} onCancel={handleCancelForm} />
+          <CampaignForm 
+            onSubmit={handleSubmitForm} 
+            onCancel={showEditForm ? handleCancelEdit : handleCancelForm}
+            initialData={selectedCampaign}
+          />
         </Paper>
       ) : (
         <Grid container spacing={3}>
           {filteredCampaigns.map((campaign, index) => (
             <Grid item xs={12} key={index}>
               <Paper style={{ padding: '20px' }}>
-                <Typography variant="h6">{campaign.campaignName}</Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="h6">{campaign.campaignName}</Typography>
+                  <IconButton onClick={() => handleEditCampaign(campaign)} color="primary">
+                    <EditIcon />
+                  </IconButton>
+                </Box>
                 <Typography>Requestor: {campaign.requestorName}</Typography>
                 <Typography>Deployment Date: {campaign.deploymentDate ? format(campaign.deploymentDate, 'MMMM d, yyyy') : ''}</Typography>
                 <Typography>Business Unit: {campaign.businessUnit}</Typography>

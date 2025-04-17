@@ -2,23 +2,25 @@ import React, { useState } from 'react';
 import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-const CampaignForm = ({ onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    requestorName: '',
-    deploymentDate: null,
-    deploymentEndDate: null,
-    earliestListDueDate: null,
-    campaignName: '',
-    targetBases: '',
-    segmentsPerBase: '',
-    businessUnit: '',
-    campaignType: '',
-    campaignCode: '',
-    subCampCode: '',
-    medium: [],
-    marcommPrime: '',
-    listSizeRequested: '',
-  });
+const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
+  const [formData, setFormData] = useState(
+    initialData || {
+      requestorName: '',
+      deploymentDate: null,
+      deploymentEndDate: null,
+      earliestListDueDate: null,
+      campaignName: '',
+      targetBases: '',
+      segmentsPerBase: '',
+      businessUnit: '',
+      campaignType: '',
+      campaignCode: '',
+      subCampCode: '',
+      medium: [],
+      marcommPrime: '',
+      listSizeRequested: '',
+    }
+  );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -242,7 +244,7 @@ const CampaignForm = ({ onSubmit, onCancel }) => {
           </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary">
-              Submit
+              {initialData ? 'Update' : 'Submit'}
             </Button>
             <Button onClick={onCancel} variant="outlined" style={{ marginLeft: '10px' }}>
               Cancel

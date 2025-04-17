@@ -119,9 +119,17 @@ const Triggers = () => {
                     <EditIcon />
                   </IconButton>
                 </Box>
+                <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Trigger Details</Typography>
                 <Typography>Type: {trigger.type}</Typography>
                 <Typography>Status: {trigger.status}</Typography>
                 <Typography>Description: {trigger.description}</Typography>
+                
+                <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Trigger Conditions</Typography>
+                {trigger.conditions?.map((condition, index) => (
+                  <Typography key={index}>
+                    {condition.field} {condition.operator} "{condition.value}"
+                  </Typography>
+                ))}
               </Paper>
             </Grid>
           ))}

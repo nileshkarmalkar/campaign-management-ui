@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useAppContext } from '../../context/AppContext';
 import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CampaignForm from './CampaignForm';
@@ -6,19 +7,13 @@ import { format } from 'date-fns';
 
 const Campaigns = () => {
   const [showForm, setShowForm] = useState(false);
-  const [campaigns, setCampaigns] = useState([]);
+  const { campaigns, addCampaign, updateCampaign, triggers } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('campaignName');
   const [showMapDialog, setShowMapDialog] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [selectedTriggers, setSelectedTriggers] = useState([]);
 
-  // Mock triggers data (replace with actual data fetching)
-  const [availableTriggers] = useState([
-    { id: 1, triggerName: 'Trigger 1', type: 'event' },
-    { id: 2, triggerName: 'Trigger 2', type: 'schedule' },
-    { id: 3, triggerName: 'Trigger 3', type: 'condition' },
-  ]);
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(campaign => {
@@ -45,7 +40,7 @@ const Campaigns = () => {
   };
 
   const handleSubmitForm = (formData) => {
-    setCampaigns([...campaigns, { ...formData, id: Date.now(), mappedTriggers: [] }]);
+    addCampaign(formData);
     setShowForm(false);
   };
 
@@ -66,12 +61,7 @@ const Campaigns = () => {
   };
 
   const handleMapDialogSubmit = () => {
-    const updatedCampaigns = campaigns.map(campaign =>
-      campaign.id === selectedCampaign.id
-        ? { ...campaign, mappedTriggers: selectedTriggers }
-        : campaign
-    );
-    setCampaigns(updatedCampaigns);
+    updateCampaign({ ...selectedCampaign, mappedTriggers: selectedTriggers });
     handleMapDialogClose();
   };
 
@@ -135,7 +125,7 @@ const Campaigns = () => {
                 <Typography>Campaign Type: {campaign.campaignType}</Typography>
                 <Typography>List Size Requested: {campaign.listSizeRequested}</Typography>
                 <Typography>
-                  Mapped Triggers: {campaign.mappedTriggers?.length ? campaign.mappedTriggers.map(t => availableTriggers.find(at => at.id === t)?.triggerName).join(', ') : 'None'}
+                  Mapped Triggers: {campaign.mappedTriggers?.length ? campaign.mappedTriggers.map(t => triggers.find(at => at.id === t)?.triggerName).join(', ') : 'None'}
                 </Typography>
                 <Button
                   onClick={() => handleMapTriggers(campaign)}
@@ -161,7 +151,7 @@ const Campaigns = () => {
               onChange={handleTriggerSelectionChange}
               renderValue={(selected) => selected.map(id => availableTriggers.find(t => t.id === id)?.triggerName).join(', ')}
             >
-              {availableTriggers.map((trigger) => (
+              {triggers.map((trigger) => (
                 <MenuItem key={trigger.id} value={trigger.id}>
                   {trigger.triggerName} ({trigger.type})
                 </MenuItem>

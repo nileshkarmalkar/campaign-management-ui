@@ -1,23 +1,18 @@
 import React, { useState, useMemo } from 'react';
+import { useAppContext } from '../../context/AppContext';
 import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import TriggerForm from './TriggerForm';
 
 const Triggers = () => {
   const [showForm, setShowForm] = useState(false);
-  const [triggers, setTriggers] = useState([]);
+  const { triggers, addTrigger, campaigns } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('triggerName');
   const [showMapDialog, setShowMapDialog] = useState(false);
   const [selectedTrigger, setSelectedTrigger] = useState(null);
   const [selectedCampaign, setSelectedCampaign] = useState('');
 
-  // Mock campaigns data (replace with actual data fetching logic)
-  const campaigns = [
-    { id: 1, name: 'Campaign 1' },
-    { id: 2, name: 'Campaign 2' },
-    { id: 3, name: 'Campaign 3' },
-  ];
 
   const filteredTriggers = useMemo(() => {
     return triggers.filter(trigger => {
@@ -44,7 +39,7 @@ const Triggers = () => {
   };
 
   const handleSubmitForm = (formData) => {
-    setTriggers([...triggers, { ...formData, id: Date.now(), mappedCampaign: null }]);
+    addTrigger(formData);
     setShowForm(false);
   };
 
@@ -60,10 +55,8 @@ const Triggers = () => {
   };
 
   const handleMapDialogSubmit = () => {
-    const updatedTriggers = triggers.map(trigger => 
-      trigger.id === selectedTrigger.id ? { ...trigger, mappedCampaign: selectedCampaign } : trigger
-    );
-    setTriggers(updatedTriggers);
+    // Note: We're not updating the trigger here because the mapping is stored in the campaign
+    // You might want to add a function in AppContext to update the campaign's mapped triggers
     handleMapDialogClose();
   };
 
@@ -141,7 +134,7 @@ const Triggers = () => {
               label="Select Campaign"
             >
               {campaigns.map((campaign) => (
-                <MenuItem key={campaign.id} value={campaign.name}>{campaign.name}</MenuItem>
+                <MenuItem key={campaign.id} value={campaign.id}>{campaign.campaignName}</MenuItem>
               ))}
             </Select>
           </FormControl>

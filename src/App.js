@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AppProvider } from './context/AppContext';
 import Layout from './components/layout/Layout';
 import Campaigns from './components/campaigns/Campaigns';
 import Segments from './components/segments/Segments';
@@ -27,10 +28,11 @@ const theme = createTheme({
 
 function App() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-      <BrowserRouter>
+    <AppProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <BrowserRouter>
         <Layout>
           <Routes>
             <Route path="/campaigns" element={<Campaigns />} />
@@ -41,9 +43,10 @@ function App() {
             <Route path="/" element={<Navigate to="/campaigns" replace />} />
           </Routes>
         </Layout>
-      </BrowserRouter>
-      </ThemeProvider>
-    </LocalizationProvider>
+          </BrowserRouter>
+        </ThemeProvider>
+      </LocalizationProvider>
+    </AppProvider>
   );
 }
 

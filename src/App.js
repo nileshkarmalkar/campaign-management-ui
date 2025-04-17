@@ -8,6 +8,7 @@ import Campaigns from './components/campaigns/Campaigns';
 import Segments from './components/segments/Segments';
 import Offers from './components/offers/Offers';
 import Communications from './components/communications/Communications';
+import Triggers from './components/triggers/Triggers';
 import './App.css';
 
 const theme = createTheme({
@@ -36,6 +37,7 @@ function App() {
             <Route path="/segments" element={<Segments />} />
             <Route path="/offers" element={<Offers />} />
             <Route path="/communications" element={<Communications />} />
+          <Route path="/triggers" element={<Triggers />} />
             <Route path="/" element={<Navigate to="/campaigns" replace />} />
           </Routes>
         </Layout>

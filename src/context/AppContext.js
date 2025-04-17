@@ -5,6 +5,7 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState([]);
   const [triggers, setTriggers] = useState([]);
+  const [segments, setSegments] = useState([]);
 
   const addCampaign = (campaign) => {
     setCampaigns([...campaigns, { ...campaign, id: Date.now(), mappedTriggers: [] }]);
@@ -32,15 +33,28 @@ export const AppProvider = ({ children }) => {
     ));
   };
 
+  const addSegment = (segment) => {
+    setSegments([...segments, { ...segment, id: Date.now() }]);
+  };
+
+  const updateSegment = (updatedSegment) => {
+    setSegments(segments.map(segment =>
+      segment.id === updatedSegment.id ? updatedSegment : segment
+    ));
+  };
+
   return (
     <AppContext.Provider value={{ 
       campaigns, 
       triggers, 
+      segments,
       addCampaign, 
       updateCampaign, 
       addTrigger,
       updateTrigger,
-      mapTriggerToCampaign 
+      mapTriggerToCampaign,
+      addSegment,
+      updateSegment
     }}>
       {children}
     </AppContext.Provider>

@@ -8,7 +8,6 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
       requestorName: '',
       deploymentDate: null,
       deploymentEndDate: null,
-      earliestListDueDate: null,
       campaignName: '',
       targetBases: '',
       segmentsPerBase: '',
@@ -18,7 +17,12 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
       subCampCode: '',
       medium: [],
       marcommPrime: '',
-      listSizeRequested: '',
+      brand: [],
+      lineOfBusiness: [],
+      contractStrategyWaiver: false,
+      contractStrategyWaiverReason: '',
+      contractExpiryDuration: '',
+      language: [],
     }
   );
 
@@ -96,14 +100,6 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 />
               )}
               minDate={formData.deploymentDate || null}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <DatePicker
-              label="Earliest List Due Date"
-              value={formData.earliestListDueDate}
-              onChange={handleDateChange('earliestListDueDate')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
             />
           </Grid>
           <Grid item xs={12}>
@@ -232,16 +228,110 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="List Size Requested"
-              name="listSizeRequested"
-              type="number"
-              value={formData.listSizeRequested}
-              onChange={handleChange}
-              required
+            <FormControl fullWidth>
+              <InputLabel>Brand</InputLabel>
+              <Select
+                multiple
+                name="brand"
+                value={formData.brand}
+                onChange={handleChange}
+                input={<OutlinedInput label="Brand" />}
+                renderValue={(selected) => selected.join(', ')}
+              >
+                {['TELUS', 'Koodo'].map((brand) => (
+                  <MenuItem key={brand} value={brand}>
+                    <Checkbox checked={formData.brand.indexOf(brand) > -1} />
+                    <ListItemText primary={brand} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Line of Business</InputLabel>
+              <Select
+                multiple
+                name="lineOfBusiness"
+                value={formData.lineOfBusiness}
+                onChange={handleChange}
+                input={<OutlinedInput label="Line of Business" />}
+                renderValue={(selected) => selected.join(', ')}
+              >
+                {['Mobility', 'Home Solution', 'Subscription on Demand'].map((lob) => (
+                  <MenuItem key={lob} value={lob}>
+                    <Checkbox checked={formData.lineOfBusiness.indexOf(lob) > -1} />
+                    <ListItemText primary={lob} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Contract Expiry Duration</InputLabel>
+              <Select
+                name="contractExpiryDuration"
+                value={formData.contractExpiryDuration}
+                onChange={handleChange}
+              >
+                <MenuItem value="1">1 month</MenuItem>
+                <MenuItem value="3">3 months</MenuItem>
+                <MenuItem value="6">6 months</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Language</InputLabel>
+              <Select
+                multiple
+                name="language"
+                value={formData.language}
+                onChange={handleChange}
+                input={<OutlinedInput label="Language" />}
+                renderValue={(selected) => selected.join(', ')}
+              >
+                {['English', 'French'].map((lang) => (
+                  <MenuItem key={lang} value={lang}>
+                    <Checkbox checked={formData.language.indexOf(lang) > -1} />
+                    <ListItemText primary={lang} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.contractStrategyWaiver}
+                  onChange={(e) => handleChange({
+                    target: {
+                      name: 'contractStrategyWaiver',
+                      value: e.target.checked
+                    }
+                  })}
+                  name="contractStrategyWaiver"
+                />
+              }
+              label="Contract Strategy Waiver"
             />
           </Grid>
+          {formData.contractStrategyWaiver && (
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Contract Strategy Waiver Reason"
+                name="contractStrategyWaiverReason"
+                value={formData.contractStrategyWaiverReason}
+                onChange={handleChange}
+                required
+                multiline
+                rows={3}
+              />
+            </Grid>
+          )}
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary">
               {initialData ? 'Update' : 'Submit'}

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton } from '@mui/material';
+import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton, Chip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import CampaignForm from './CampaignForm';
@@ -13,7 +13,6 @@ const Campaigns = () => {
   const [searchField, setSearchField] = useState('campaignName');
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
-
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(campaign => {
@@ -28,7 +27,7 @@ const Campaigns = () => {
 
   const handleSearchFieldChange = (event) => {
     setSearchField(event.target.value);
-    setSearchTerm(''); // Reset search term when changing search field
+    setSearchTerm('');
   };
 
   const handleAddCampaign = () => {
@@ -59,7 +58,6 @@ const Campaigns = () => {
     setShowEditForm(false);
     setSelectedCampaign(null);
   };
-
 
   return (
     <div>
@@ -126,9 +124,32 @@ const Campaigns = () => {
                 </Box>
                 <Typography>Requestor: {campaign.requestorName}</Typography>
                 <Typography>Deployment Date: {campaign.deploymentDate ? format(campaign.deploymentDate, 'MMMM d, yyyy') : ''}</Typography>
+                <Typography>Deployment End Date: {campaign.deploymentEndDate ? format(campaign.deploymentEndDate, 'MMMM d, yyyy') : ''}</Typography>
                 <Typography>Business Unit: {campaign.businessUnit}</Typography>
                 <Typography>Campaign Type: {campaign.campaignType}</Typography>
-                <Typography>List Size Requested: {campaign.listSizeRequested}</Typography>
+                <Typography>Campaign Code: {campaign.campaignCode}</Typography>
+                <Typography>Sub Camp Code: {campaign.subCampCode}</Typography>
+                <Typography>Marcomm Prime: {campaign.marcommPrime}</Typography>
+                <Typography>
+                  Brand: {campaign.brand.map(b => (
+                    <Chip key={b} label={b} style={{marginRight: '5px'}} />
+                  ))}
+                </Typography>
+                <Typography>
+                  Line of Business: {campaign.lineOfBusiness.map(lob => (
+                    <Chip key={lob} label={lob} style={{marginRight: '5px'}} />
+                  ))}
+                </Typography>
+                <Typography>Contract Expiry Duration: {campaign.contractExpiryDuration} month(s)</Typography>
+                <Typography>
+                  Language: {campaign.language.map(lang => (
+                    <Chip key={lang} label={lang} style={{marginRight: '5px'}} />
+                  ))}
+                </Typography>
+                <Typography>Contract Strategy Waiver: {campaign.contractStrategyWaiver ? 'Yes' : 'No'}</Typography>
+                {campaign.contractStrategyWaiver && (
+                  <Typography>Contract Strategy Waiver Reason: {campaign.contractStrategyWaiverReason}</Typography>
+                )}
               </Paper>
             </Grid>
           ))}

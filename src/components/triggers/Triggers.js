@@ -6,7 +6,7 @@ import TriggerForm from './TriggerForm';
 
 const Triggers = () => {
   const [showForm, setShowForm] = useState(false);
-  const { triggers, addTrigger, campaigns } = useAppContext();
+  const { triggers, addTrigger, campaigns, mapTriggerToCampaign } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('triggerName');
   const [showMapDialog, setShowMapDialog] = useState(false);
@@ -55,9 +55,16 @@ const Triggers = () => {
   };
 
   const handleMapDialogSubmit = () => {
-    // Note: We're not updating the trigger here because the mapping is stored in the campaign
-    // You might want to add a function in AppContext to update the campaign's mapped triggers
+    if (selectedTrigger && selectedCampaign) {
+      mapTriggerToCampaign(selectedTrigger.id, selectedCampaign);
+    }
     handleMapDialogClose();
+  };
+
+  const getMappedCampaignName = (trigger) => {
+    if (!trigger.mappedCampaignId) return 'Not mapped';
+    const campaign = campaigns.find(c => c.id === trigger.mappedCampaignId);
+    return campaign ? campaign.campaignName : 'Not mapped';
   };
 
   return (
@@ -114,7 +121,7 @@ const Triggers = () => {
                 <Typography variant="h6">{trigger.triggerName}</Typography>
                 <Typography>Type: {trigger.type}</Typography>
                 <Typography>Status: {trigger.status}</Typography>
-                <Typography>Mapped Campaign: {trigger.mappedCampaign || 'Not mapped'}</Typography>
+                <Typography>Mapped Campaign: {getMappedCampaignName(trigger)}</Typography>
                 <Button onClick={() => handleMapTrigger(trigger)} variant="outlined" style={{ marginTop: '10px' }}>
                   Map to Campaign
                 </Button>

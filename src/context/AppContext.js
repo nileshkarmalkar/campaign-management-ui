@@ -17,11 +17,31 @@ export const AppProvider = ({ children }) => {
   };
 
   const addTrigger = (trigger) => {
-    setTriggers([...triggers, { ...trigger, id: Date.now() }]);
+    setTriggers([...triggers, { ...trigger, id: Date.now(), mappedCampaignId: null }]);
+  };
+
+  const updateTrigger = (updatedTrigger) => {
+    setTriggers(triggers.map(trigger =>
+      trigger.id === updatedTrigger.id ? updatedTrigger : trigger
+    ));
+  };
+
+  const mapTriggerToCampaign = (triggerId, campaignId) => {
+    setTriggers(triggers.map(trigger =>
+      trigger.id === triggerId ? { ...trigger, mappedCampaignId: campaignId } : trigger
+    ));
   };
 
   return (
-    <AppContext.Provider value={{ campaigns, triggers, addCampaign, updateCampaign, addTrigger }}>
+    <AppContext.Provider value={{ 
+      campaigns, 
+      triggers, 
+      addCampaign, 
+      updateCampaign, 
+      addTrigger,
+      updateTrigger,
+      mapTriggerToCampaign 
+    }}>
       {children}
     </AppContext.Provider>
   );

@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 
 const Campaigns = () => {
   const [showForm, setShowForm] = useState(false);
-  const { campaigns, addCampaign, updateCampaign, triggers } = useAppContext();
+  const { campaigns, addCampaign, updateCampaign, triggers, mapTriggerToCampaign } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('campaignName');
   const [showMapDialog, setShowMapDialog] = useState(false);
@@ -61,8 +61,15 @@ const Campaigns = () => {
   };
 
   const handleMapDialogSubmit = () => {
-    updateCampaign({ ...selectedCampaign, mappedTriggers: selectedTriggers });
+    // Update all selected triggers to map to this campaign
+    selectedTriggers.forEach(triggerId => {
+      mapTriggerToCampaign(triggerId, selectedCampaign.id);
+    });
     handleMapDialogClose();
+  };
+
+  const getMappedTriggersForCampaign = (campaign) => {
+    return triggers.filter(trigger => trigger.mappedCampaignId === campaign.id);
   };
 
   return (
@@ -125,7 +132,9 @@ const Campaigns = () => {
                 <Typography>Campaign Type: {campaign.campaignType}</Typography>
                 <Typography>List Size Requested: {campaign.listSizeRequested}</Typography>
                 <Typography>
-                  Mapped Triggers: {campaign.mappedTriggers?.length ? campaign.mappedTriggers.map(t => triggers.find(at => at.id === t)?.triggerName).join(', ') : 'None'}
+                  Mapped Triggers: {getMappedTriggersForCampaign(campaign).length > 0 
+                    ? getMappedTriggersForCampaign(campaign).map(t => t.triggerName).join(', ') 
+                    : 'None'}
                 </Typography>
                 <Button
                   onClick={() => handleMapTriggers(campaign)}
@@ -149,7 +158,7 @@ const Campaigns = () => {
               multiple
               value={selectedTriggers}
               onChange={handleTriggerSelectionChange}
-              renderValue={(selected) => selected.map(id => triggers.find(t => t.id === id)?.triggerName).join(', ')}
+              renderValue={(selected) => selected.map(id => triggers.find(t => t.id === id)?.triggerName || '').filter(Boolean).join(', ')}
             >
               {triggers.map((trigger) => (
                 <MenuItem key={trigger.id} value={trigger.id}>

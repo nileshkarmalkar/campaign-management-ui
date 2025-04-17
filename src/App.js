@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -32,7 +32,7 @@ function App() {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <BrowserRouter>
+          <HashRouter>
         <Layout>
           <Routes>
             <Route path="/campaigns" element={<Campaigns />} />
@@ -43,7 +43,7 @@ function App() {
             <Route path="/" element={<Navigate to="/campaigns" replace />} />
           </Routes>
         </Layout>
-          </BrowserRouter>
+          </HashRouter>
         </ThemeProvider>
       </LocalizationProvider>
     </AppProvider>

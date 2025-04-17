@@ -124,8 +124,10 @@ const Campaigns = () => {
                 </Box>
                 <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Campaign Metadata</Typography>
                 <Typography>Requestor: {campaign.requestorName}</Typography>
-                <Typography>Deployment Date: {campaign.deploymentDate ? format(campaign.deploymentDate, 'MMMM d, yyyy') : ''}</Typography>
-                <Typography>Deployment End Date: {campaign.deploymentEndDate ? format(campaign.deploymentEndDate, 'MMMM d, yyyy') : ''}</Typography>
+                <Box display="flex" gap={2}>
+                  <Typography>Deployment Date: {campaign.deploymentDate ? format(campaign.deploymentDate, 'MMMM d, yyyy') : ''}</Typography>
+                  <Typography>End Date: {campaign.deploymentEndDate ? format(campaign.deploymentEndDate, 'MMMM d, yyyy') : ''}</Typography>
+                </Box>
                 <Typography>
                   Business Unit: {campaign.businessUnit.map(unit => (
                     <Chip key={unit} label={unit} style={{marginRight: '5px'}} />

@@ -93,7 +93,17 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
             <Typography variant="h6">Campaign Metadata</Typography>
             <Divider />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Campaign Name"
+              name="campaignName"
+              value={formData.campaignName}
+              onChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
             <TextField
               fullWidth
               label="Name of Requestor"
@@ -126,16 +136,6 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 />
               )}
               minDate={formData.deploymentDate || null}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Campaign Name"
-              name="campaignName"
-              value={formData.campaignName}
-              onChange={handleChange}
-              required
             />
           </Grid>
           <Grid item xs={12} sm={6}>

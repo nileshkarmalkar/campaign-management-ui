@@ -163,7 +163,12 @@ const Segments = () => {
                     }
                   })()}
                 </Typography>
-                <Typography>Triggers: {segment.triggers.map(t => triggers.find(trigger => trigger.id === t)?.triggerName).join(', ')}</Typography>
+                <Typography>
+                  Triggers: {segment.triggers.map(t => {
+                    const trigger = triggers.find(trigger => trigger.id === t);
+                    return trigger ? `${trigger.triggerName} (${trigger.type})` : '';
+                  }).filter(Boolean).join(', ')}
+                </Typography>
                 <Typography>Existing Segments: {segment.existingSegments.map(s => segments.find(seg => seg.id === s)?.segmentName).join(', ')}</Typography>
               </Paper>
             </Grid>

@@ -25,14 +25,38 @@ const CampaignForm = ({ onSubmit, onCancel }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const [dateErrors, setDateErrors] = useState({
+    deploymentEndDate: '',
+  });
+
+  const validateDates = (newFormData) => {
+    const errors = {
+      deploymentEndDate: '',
+    };
+
+    if (newFormData.deploymentEndDate && newFormData.deploymentDate) {
+      if (newFormData.deploymentEndDate < newFormData.deploymentDate) {
+        errors.deploymentEndDate = 'End date must be after or equal to deployment date';
+      }
+    }
+
+    setDateErrors(errors);
+    return !Object.values(errors).some(error => error !== '');
+  };
+
   const handleDateChange = (name) => (date) => {
-    setFormData({ ...formData, [name]: date });
+    const newFormData = { ...formData, [name]: date };
+    setFormData(newFormData);
+    validateDates(newFormData);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onSubmit(formData);
+    if (validateDates(formData)) {
+      onSubmit(formData);
+    }
   };
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -60,7 +84,16 @@ const CampaignForm = ({ onSubmit, onCancel }) => {
               label="Campaign Deployment End Date"
               value={formData.deploymentEndDate}
               onChange={handleDateChange('deploymentEndDate')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  fullWidth
+                  required
+                  error={!!dateErrors.deploymentEndDate}
+                  helperText={dateErrors.deploymentEndDate}
+                />
+              )}
+              minDate={formData.deploymentDate || null}
             />
           </Grid>
           <Grid item xs={12} sm={6}>

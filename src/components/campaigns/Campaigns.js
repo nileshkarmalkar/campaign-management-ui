@@ -149,7 +149,7 @@ const Campaigns = () => {
               multiple
               value={selectedTriggers}
               onChange={handleTriggerSelectionChange}
-              renderValue={(selected) => selected.map(id => availableTriggers.find(t => t.id === id)?.triggerName).join(', ')}
+              renderValue={(selected) => selected.map(id => triggers.find(t => t.id === id)?.triggerName).join(', ')}
             >
               {triggers.map((trigger) => (
                 <MenuItem key={trigger.id} value={trigger.id}>

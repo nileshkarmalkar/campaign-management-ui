@@ -122,14 +122,21 @@ const Campaigns = () => {
                     <EditIcon />
                   </IconButton>
                 </Box>
+                <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Campaign Metadata</Typography>
                 <Typography>Requestor: {campaign.requestorName}</Typography>
                 <Typography>Deployment Date: {campaign.deploymentDate ? format(campaign.deploymentDate, 'MMMM d, yyyy') : ''}</Typography>
                 <Typography>Deployment End Date: {campaign.deploymentEndDate ? format(campaign.deploymentEndDate, 'MMMM d, yyyy') : ''}</Typography>
-                <Typography>Business Unit: {campaign.businessUnit}</Typography>
+                <Typography>
+                  Business Unit: {campaign.businessUnit.map(unit => (
+                    <Chip key={unit} label={unit} style={{marginRight: '5px'}} />
+                  ))}
+                </Typography>
                 <Typography>Campaign Type: {campaign.campaignType}</Typography>
                 <Typography>Campaign Code: {campaign.campaignCode}</Typography>
                 <Typography>Sub Camp Code: {campaign.subCampCode}</Typography>
                 <Typography>Marcomm Prime: {campaign.marcommPrime}</Typography>
+                
+                <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Inclusion Criteria</Typography>
                 <Typography>
                   Brand: {campaign.brand.map(b => (
                     <Chip key={b} label={b} style={{marginRight: '5px'}} />
@@ -146,10 +153,21 @@ const Campaigns = () => {
                     <Chip key={lang} label={lang} style={{marginRight: '5px'}} />
                   ))}
                 </Typography>
-                <Typography>Contract Strategy Waiver: {campaign.contractStrategyWaiver ? 'Yes' : 'No'}</Typography>
-                {campaign.contractStrategyWaiver && (
-                  <Typography>Contract Strategy Waiver Reason: {campaign.contractStrategyWaiverReason}</Typography>
-                )}
+                <Typography>
+                  Prepaid/Postpaid: {campaign.prepaidPostpaid.map(option => (
+                    <Chip key={option} label={option} style={{marginRight: '5px'}} />
+                  ))}
+                </Typography>
+                <Typography>BYOD: {campaign.byod ? 'Yes' : 'No'}</Typography>
+                <Typography>MTM: {campaign.mtm ? 'Yes' : 'No'}</Typography>
+
+                <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Exclusion Criteria</Typography>
+                <Typography>
+                  Renewal Window: {campaign.renewalWindow.operator} {campaign.renewalWindow.value} days
+                </Typography>
+                <Typography>
+                  Contact Strategy Rule: {campaign.contactStrategyRule.operator} {campaign.contactStrategyRule.value} days
+                </Typography>
               </Paper>
             </Grid>
           ))}

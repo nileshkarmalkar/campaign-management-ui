@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select, OutlinedInput, Checkbox, ListItemText, FormControlLabel } from '@mui/material';
+import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select, OutlinedInput, Checkbox, ListItemText, FormControlLabel, Typography, Divider } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
@@ -11,7 +11,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
       campaignName: '',
       targetBases: '',
       segmentsPerBase: '',
-      businessUnit: '',
+      businessUnit: [],
       campaignType: '',
       campaignCode: '',
       subCampCode: '',
@@ -23,12 +23,34 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
       contractStrategyWaiverReason: '',
       contractExpiryDuration: '',
       language: [],
+      prepaidPostpaid: [],
+      byod: false,
+      mtm: false,
+      renewalWindow: {
+        operator: '=',
+        value: ''
+      },
+      contactStrategyRule: {
+        operator: '=',
+        value: ''
+      }
     }
   );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setFormData({
+        ...formData,
+        [parent]: {
+          ...formData[parent],
+          [child]: value
+        }
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const [dateErrors, setDateErrors] = useState({
@@ -67,6 +89,10 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
   return (
     <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Typography variant="h6">Campaign Metadata</Typography>
+            <Divider />
+          </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -145,17 +171,20 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
             <FormControl fullWidth>
               <InputLabel>Business Unit</InputLabel>
               <Select
+                multiple
                 name="businessUnit"
                 value={formData.businessUnit}
                 onChange={handleChange}
+                input={<OutlinedInput label="Business Unit" />}
+                renderValue={(selected) => selected.join(', ')}
                 required
               >
-                <MenuItem value="FFH">FFH - Home Solutions</MenuItem>
-                <MenuItem value="Mobility">Mobility - TELUS</MenuItem>
-                <MenuItem value="Koodo">Koodo</MenuItem>
-                <MenuItem value="EPP">EPP</MenuItem>
-                <MenuItem value="PublicMobile">Public Mobile</MenuItem>
-                <MenuItem value="Others">Others - Masterbrand, Health etc</MenuItem>
+                {['FFH - Home Solutions', 'Mobility - TELUS', 'Koodo', 'EPP', 'PublicMobile', 'Others - Masterbrand, Health etc'].map((unit) => (
+                  <MenuItem key={unit} value={unit}>
+                    <Checkbox checked={formData.businessUnit.indexOf(unit) > -1} />
+                    <ListItemText primary={unit} />
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -226,6 +255,10 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               onChange={handleChange}
               required
             />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6">Inclusion Criteria</Typography>
+            <Divider />
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
@@ -302,36 +335,111 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Prepaid/Postpaid</InputLabel>
+              <Select
+                multiple
+                name="prepaidPostpaid"
+                value={formData.prepaidPostpaid}
+                onChange={handleChange}
+                input={<OutlinedInput label="Prepaid/Postpaid" />}
+                renderValue={(selected) => selected.join(', ')}
+              >
+                {['Prepaid', 'Postpaid'].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <Checkbox checked={formData.prepaidPostpaid.indexOf(option) > -1} />
+                    <ListItemText primary={option} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={formData.contractStrategyWaiver}
+                  checked={formData.byod}
                   onChange={(e) => handleChange({
                     target: {
-                      name: 'contractStrategyWaiver',
+                      name: 'byod',
                       value: e.target.checked
                     }
                   })}
-                  name="contractStrategyWaiver"
+                  name="byod"
                 />
               }
-              label="Contract Strategy Waiver"
+              label="BYOD"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.mtm}
+                  onChange={(e) => handleChange({
+                    target: {
+                      name: 'mtm',
+                      value: e.target.checked
+                    }
+                  })}
+                  name="mtm"
+                />
+              }
+              label="MTM"
             />
           </Grid>
-          {formData.contractStrategyWaiver && (
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Contract Strategy Waiver Reason"
-                name="contractStrategyWaiverReason"
-                value={formData.contractStrategyWaiverReason}
+          <Grid item xs={12}>
+            <Typography variant="h6">Exclusion Criteria</Typography>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Renewal Window Operator</InputLabel>
+              <Select
+                name="renewalWindow.operator"
+                value={formData.renewalWindow.operator}
                 onChange={handleChange}
-                required
-                multiline
-                rows={3}
-              />
-            </Grid>
-          )}
+              >
+                <MenuItem value="=">=</MenuItem>
+                <MenuItem value="<=">≤</MenuItem>
+                <MenuItem value=">=">≥</MenuItem>
+                <MenuItem value="between">Between</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Renewal Window Value (Days)"
+              name="renewalWindow.value"
+              type="number"
+              value={formData.renewalWindow.value}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Contact Strategy Rule Operator</InputLabel>
+              <Select
+                name="contactStrategyRule.operator"
+                value={formData.contactStrategyRule.operator}
+                onChange={handleChange}
+              >
+                <MenuItem value="=">=</MenuItem>
+                <MenuItem value="<=">≤</MenuItem>
+                <MenuItem value=">=">≥</MenuItem>
+                <MenuItem value="between">Between</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Contact Strategy Rule Value (Days)"
+              name="contactStrategyRule.value"
+              type="number"
+              value={formData.contactStrategyRule.value}
+              onChange={handleChange}
+            />
+          </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary">
               {initialData ? 'Update' : 'Submit'}

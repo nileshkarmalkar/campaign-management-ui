@@ -137,7 +137,6 @@ const Segments = () => {
                   </IconButton>
                 </Box>
                 <Typography>Description: {segment.description}</Typography>
-                <Typography>Refresh Frequency: {segment.refreshFrequency}</Typography>
                 <Typography style={{ color: getStatusColor(segment.status) }}>
                   Status: {segment.status}
                 </Typography>

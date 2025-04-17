@@ -8,7 +8,6 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
       description: '',
       status: 'active',
       source: '',
-      refreshFrequency: 'daily',
       brand: [],
       lineOfBusiness: [],
       accountType: [],
@@ -183,27 +182,27 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={4}>
               <FormControl fullWidth>
-                <InputLabel>MSF Amount Operator</InputLabel>
+                <InputLabel>MSF Amount</InputLabel>
                 <Select
                   name="msfAmount.operator"
                   value={formData.msfAmount.operator}
                   onChange={handleChange}
-                  input={<OutlinedInput label="MSF Amount Operator" />}
+                  input={<OutlinedInput label="MSF Amount" />}
                 >
-                  <MenuItem value=">=">Greater than or equal to</MenuItem>
-                  <MenuItem value="<=">Less than or equal to</MenuItem>
+                  <MenuItem value=">=">≥</MenuItem>
+                  <MenuItem value="<=">≤</MenuItem>
                   <MenuItem value="between">Between</MenuItem>
                   <MenuItem value="=">Equal to</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={formData.msfAmount.operator === 'between' ? 6 : 12}>
+            <Grid item xs={formData.msfAmount.operator === 'between' ? 4 : 8}>
               <TextField
                 fullWidth
-                label={formData.msfAmount.operator === 'between' ? "From Amount" : "Amount"}
+                label={formData.msfAmount.operator === 'between' ? "From" : "Amount"}
                 name="msfAmount.value1"
                 type="number"
                 value={formData.msfAmount.value1}
@@ -214,10 +213,10 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
               />
             </Grid>
             {formData.msfAmount.operator === 'between' && (
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <TextField
                   fullWidth
-                  label="To Amount"
+                  label="To"
                   name="msfAmount.value2"
                   type="number"
                   value={formData.msfAmount.value2}
@@ -269,21 +268,6 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
                     <ListItemText primary={segment.segmentName} />
                 </MenuItem>
               ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Refresh Frequency</InputLabel>
-            <Select
-              name="refreshFrequency"
-              value={formData.refreshFrequency}
-              onChange={handleChange}
-            >
-              <MenuItem value="daily">Daily</MenuItem>
-              <MenuItem value="weekly">Weekly</MenuItem>
-              <MenuItem value="monthly">Monthly</MenuItem>
-              <MenuItem value="quarterly">Quarterly</MenuItem>
             </Select>
           </FormControl>
         </Grid>

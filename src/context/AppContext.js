@@ -8,7 +8,7 @@ export const AppProvider = ({ children }) => {
   const [segments, setSegments] = useState([]);
 
   const addCampaign = (campaign) => {
-    setCampaigns([...campaigns, { ...campaign, id: Date.now(), mappedTriggers: [] }]);
+    setCampaigns([...campaigns, { ...campaign, id: Date.now() }]);
   };
 
   const updateCampaign = (updatedCampaign) => {
@@ -18,18 +18,12 @@ export const AppProvider = ({ children }) => {
   };
 
   const addTrigger = (trigger) => {
-    setTriggers([...triggers, { ...trigger, id: Date.now(), mappedCampaignId: null }]);
+    setTriggers([...triggers, { ...trigger, id: Date.now() }]);
   };
 
   const updateTrigger = (updatedTrigger) => {
     setTriggers(triggers.map(trigger =>
       trigger.id === updatedTrigger.id ? updatedTrigger : trigger
-    ));
-  };
-
-  const mapTriggerToCampaign = (triggerId, campaignId) => {
-    setTriggers(triggers.map(trigger =>
-      trigger.id === triggerId ? { ...trigger, mappedCampaignId: campaignId } : trigger
     ));
   };
 
@@ -56,7 +50,6 @@ export const AppProvider = ({ children }) => {
       updateCampaign, 
       addTrigger,
       updateTrigger,
-      mapTriggerToCampaign,
       addSegment,
       updateSegment,
       getSegmentById

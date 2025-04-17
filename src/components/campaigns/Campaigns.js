@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import CampaignForm from './CampaignForm';
@@ -8,13 +8,11 @@ import { format } from 'date-fns';
 
 const Campaigns = () => {
   const [showForm, setShowForm] = useState(false);
-  const { campaigns, addCampaign, updateCampaign, triggers, mapTriggerToCampaign } = useAppContext();
+  const { campaigns, addCampaign, updateCampaign } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('campaignName');
-  const [showMapDialog, setShowMapDialog] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
-  const [selectedTriggers, setSelectedTriggers] = useState([]);
 
 
   const filteredCampaigns = useMemo(() => {
@@ -43,7 +41,7 @@ const Campaigns = () => {
 
   const handleSubmitForm = (formData) => {
     if (selectedCampaign) {
-      updateCampaign({ ...formData, id: selectedCampaign.id, mappedTriggers: selectedCampaign.mappedTriggers });
+      updateCampaign({ ...formData, id: selectedCampaign.id });
       setShowEditForm(false);
       setSelectedCampaign(null);
     } else {
@@ -62,33 +60,6 @@ const Campaigns = () => {
     setSelectedCampaign(null);
   };
 
-  const handleMapTriggers = (campaign) => {
-    setSelectedCampaign(campaign);
-    setSelectedTriggers(campaign.mappedTriggers || []);
-    setShowMapDialog(true);
-  };
-
-  const handleMapDialogClose = () => {
-    setShowMapDialog(false);
-    setSelectedCampaign(null);
-    setSelectedTriggers([]);
-  };
-
-  const handleTriggerSelectionChange = (event) => {
-    setSelectedTriggers(event.target.value);
-  };
-
-  const handleMapDialogSubmit = () => {
-    // Update all selected triggers to map to this campaign
-    selectedTriggers.forEach(triggerId => {
-      mapTriggerToCampaign(triggerId, selectedCampaign.id);
-    });
-    handleMapDialogClose();
-  };
-
-  const getMappedTriggersForCampaign = (campaign) => {
-    return triggers.filter(trigger => trigger.mappedCampaignId === campaign.id);
-  };
 
   return (
     <div>
@@ -158,50 +129,11 @@ const Campaigns = () => {
                 <Typography>Business Unit: {campaign.businessUnit}</Typography>
                 <Typography>Campaign Type: {campaign.campaignType}</Typography>
                 <Typography>List Size Requested: {campaign.listSizeRequested}</Typography>
-                <Typography>
-                  Mapped Triggers: {getMappedTriggersForCampaign(campaign).length > 0 
-                    ? getMappedTriggersForCampaign(campaign).map(t => t.triggerName).join(', ') 
-                    : 'None'}
-                </Typography>
-                <Button
-                  onClick={() => handleMapTriggers(campaign)}
-                  variant="outlined"
-                  color="primary"
-                  style={{ marginTop: '10px' }}
-                >
-                  Map Triggers
-                </Button>
               </Paper>
             </Grid>
           ))}
         </Grid>
       )}
-      <Dialog open={showMapDialog} onClose={handleMapDialogClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Map Triggers to Campaign</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>Select Triggers</InputLabel>
-            <Select
-              multiple
-              value={selectedTriggers}
-              onChange={handleTriggerSelectionChange}
-              renderValue={(selected) => selected.map(id => triggers.find(t => t.id === id)?.triggerName || '').filter(Boolean).join(', ')}
-            >
-              {triggers.map((trigger) => (
-                <MenuItem key={trigger.id} value={trigger.id}>
-                  {trigger.triggerName} ({trigger.type})
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleMapDialogClose}>Cancel</Button>
-          <Button onClick={handleMapDialogSubmit} variant="contained" color="primary">
-            Save Mapping
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

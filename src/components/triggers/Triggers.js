@@ -1,20 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import TriggerForm from './TriggerForm';
 
 const Triggers = () => {
   const [showForm, setShowForm] = useState(false);
-  const { triggers, addTrigger, updateTrigger, campaigns, mapTriggerToCampaign } = useAppContext();
+  const { triggers, addTrigger, updateTrigger } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('triggerName');
-  const [showMapDialog, setShowMapDialog] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedTrigger, setSelectedTrigger] = useState(null);
-  const [selectedCampaign, setSelectedCampaign] = useState('');
-
 
   const filteredTriggers = useMemo(() => {
     return triggers.filter(trigger => {
@@ -42,7 +39,7 @@ const Triggers = () => {
 
   const handleSubmitForm = (formData) => {
     if (selectedTrigger) {
-      updateTrigger({ ...formData, id: selectedTrigger.id, mappedCampaignId: selectedTrigger.mappedCampaignId });
+      updateTrigger({ ...formData, id: selectedTrigger.id });
       setShowEditForm(false);
       setSelectedTrigger(null);
     } else {
@@ -59,30 +56,6 @@ const Triggers = () => {
   const handleCancelEdit = () => {
     setShowEditForm(false);
     setSelectedTrigger(null);
-  };
-
-  const handleMapTrigger = (trigger) => {
-    setSelectedTrigger(trigger);
-    setShowMapDialog(true);
-  };
-
-  const handleMapDialogClose = () => {
-    setShowMapDialog(false);
-    setSelectedTrigger(null);
-    setSelectedCampaign('');
-  };
-
-  const handleMapDialogSubmit = () => {
-    if (selectedTrigger && selectedCampaign) {
-      mapTriggerToCampaign(selectedTrigger.id, selectedCampaign);
-    }
-    handleMapDialogClose();
-  };
-
-  const getMappedCampaignName = (trigger) => {
-    if (!trigger.mappedCampaignId) return 'Not mapped';
-    const campaign = campaigns.find(c => c.id === trigger.mappedCampaignId);
-    return campaign ? campaign.campaignName : 'Not mapped';
   };
 
   return (
@@ -148,36 +121,12 @@ const Triggers = () => {
                 </Box>
                 <Typography>Type: {trigger.type}</Typography>
                 <Typography>Status: {trigger.status}</Typography>
-                <Typography>Mapped Campaign: {getMappedCampaignName(trigger)}</Typography>
-                <Button onClick={() => handleMapTrigger(trigger)} variant="outlined" style={{ marginTop: '10px' }}>
-                  Map to Campaign
-                </Button>
+                <Typography>Description: {trigger.description}</Typography>
               </Paper>
             </Grid>
           ))}
         </Grid>
       )}
-      <Dialog open={showMapDialog} onClose={handleMapDialogClose}>
-        <DialogTitle>Map Trigger to Campaign</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>Select Campaign</InputLabel>
-            <Select
-              value={selectedCampaign}
-              onChange={(e) => setSelectedCampaign(e.target.value)}
-              label="Select Campaign"
-            >
-              {campaigns.map((campaign) => (
-                <MenuItem key={campaign.id} value={campaign.id}>{campaign.campaignName}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleMapDialogClose}>Cancel</Button>
-          <Button onClick={handleMapDialogSubmit} variant="contained" color="primary">Map</Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

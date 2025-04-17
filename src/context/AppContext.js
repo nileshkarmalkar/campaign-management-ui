@@ -43,6 +43,10 @@ export const AppProvider = ({ children }) => {
     ));
   };
 
+  const getSegmentById = (id) => {
+    return segments.find(segment => segment.id === id);
+  };
+
   return (
     <AppContext.Provider value={{ 
       campaigns, 
@@ -54,7 +58,8 @@ export const AppProvider = ({ children }) => {
       updateTrigger,
       mapTriggerToCampaign,
       addSegment,
-      updateSegment
+      updateSegment,
+      getSegmentById
     }}>
       {children}
     </AppContext.Provider>

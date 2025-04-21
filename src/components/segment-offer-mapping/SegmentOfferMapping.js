@@ -131,7 +131,12 @@ const SegmentOfferMapping = () => {
                 label="Start Date"
                 value={formData.startDate}
                 onChange={handleDateChange}
-                renderInput={(params) => <TextField {...params} fullWidth required />}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    required: true
+                  }
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={2}>

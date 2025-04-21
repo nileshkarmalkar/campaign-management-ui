@@ -4,7 +4,6 @@ import {
   Typography, 
   TextField, 
   Button, 
-  Grid, 
   Paper, 
   Table, 
   TableBody, 
@@ -12,49 +11,21 @@ import {
   TableContainer, 
   TableHead, 
   TableRow,
-  InputAdornment
+  InputAdornment,
+  Box
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
 import { format } from 'date-fns';
+import SegmentOfferMappingForm from './SegmentOfferMappingForm';
 
 const SegmentOfferMapping = () => {
   const { segmentOfferMappings = [], addSegmentOfferMapping, updateSegmentOfferMapping } = useAppContext();
-  console.log('segmentOfferMappings:', segmentOfferMappings);
-  const [formData, setFormData] = useState({
-    segmentId: '',
-    segmentName: '',
-    offerId: '',
-    offerName: '',
-    startDate: null
-  });
   const [searchTerm, setSearchTerm] = useState('');
+  const [openForm, setOpenForm] = useState(false);
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleDateChange = (date) => {
-    setFormData({ ...formData, startDate: date });
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const newMapping = {
-      ...formData,
-      id: Date.now(),
-      status: 'Created',
-      endDate: null
-    };
-    addSegmentOfferMapping(newMapping);
-    setFormData({
-      segmentId: '',
-      segmentName: '',
-      offerId: '',
-      offerName: '',
-      startDate: null
-    });
-  };
+  const handleOpenForm = () => setOpenForm(true);
+  const handleCloseForm = () => setOpenForm(false);
 
   const handleStatusChange = (id, newStatus) => {
     const mappingToUpdate = segmentOfferMappings.find(mapping => mapping.id === id);
@@ -82,85 +53,28 @@ const SegmentOfferMapping = () => {
       <Typography variant="h4" gutterBottom>
         Segment-Offer Mapping
       </Typography>
-      <Paper style={{ padding: '20px', marginBottom: '20px' }}>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={2}>
-              <TextField
-                fullWidth
-                label="Segment ID"
-                name="segmentId"
-                value={formData.segmentId}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <TextField
-                fullWidth
-                label="Segment Name"
-                name="segmentName"
-                value={formData.segmentName}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <TextField
-                fullWidth
-                label="Offer ID"
-                name="offerId"
-                value={formData.offerId}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <TextField
-                fullWidth
-                label="Offer Name"
-                name="offerName"
-                value={formData.offerName}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <TextField
-                fullWidth
-                type="date"
-                label="Start Date"
-                name="startDate"
-                value={formData.startDate ? formData.startDate.toISOString().split('T')[0] : ''}
-                onChange={(e) => handleDateChange(new Date(e.target.value))}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Button type="submit" variant="contained" color="primary" fullWidth>
-                Create Mapping
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
-      <TextField
-        fullWidth
-        label="Search Mappings"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ marginBottom: '20px' }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <TextField
+          label="Search Mappings"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleOpenForm}
+        >
+          Add New Mapping
+        </Button>
+      </Box>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -183,8 +97,8 @@ const SegmentOfferMapping = () => {
                 <TableCell>{mapping.offerId}</TableCell>
                 <TableCell>{mapping.offerName}</TableCell>
                 <TableCell>{mapping.status}</TableCell>
-                <TableCell>{format(mapping.startDate, 'MM/dd/yyyy')}</TableCell>
-                <TableCell>{mapping.endDate ? format(mapping.endDate, 'MM/dd/yyyy') : '-'}</TableCell>
+                <TableCell>{mapping.startDate ? format(new Date(mapping.startDate), 'MM/dd/yyyy') : '-'}</TableCell>
+                <TableCell>{mapping.endDate ? format(new Date(mapping.endDate), 'MM/dd/yyyy') : '-'}</TableCell>
                 <TableCell>
                   {mapping.status === 'Created' && (
                     <Button onClick={() => handleStatusChange(mapping.id, 'Live')}>
@@ -202,6 +116,11 @@ const SegmentOfferMapping = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <SegmentOfferMappingForm
+        open={openForm}
+        handleClose={handleCloseForm}
+        addSegmentOfferMapping={addSegmentOfferMapping}
+      />
     </div>
   );
 };

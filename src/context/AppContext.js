@@ -6,6 +6,7 @@ export const AppProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState([]);
   const [triggers, setTriggers] = useState([]);
   const [segments, setSegments] = useState([]);
+  const [segmentOfferMappings, setSegmentOfferMappings] = useState([]);
 
   const addCampaign = (campaign) => {
     setCampaigns([...campaigns, { ...campaign, id: Date.now() }]);
@@ -41,6 +42,16 @@ export const AppProvider = ({ children }) => {
     return segments.find(segment => segment.id === id);
   };
 
+  const addSegmentOfferMapping = (mapping) => {
+    setSegmentOfferMappings([...segmentOfferMappings, { ...mapping, id: Date.now() }]);
+  };
+
+  const updateSegmentOfferMapping = (updatedMapping) => {
+    setSegmentOfferMappings(segmentOfferMappings.map(mapping =>
+      mapping.id === updatedMapping.id ? updatedMapping : mapping
+    ));
+  };
+
   return (
     <AppContext.Provider value={{ 
       campaigns, 
@@ -52,7 +63,10 @@ export const AppProvider = ({ children }) => {
       updateTrigger,
       addSegment,
       updateSegment,
-      getSegmentById
+      getSegmentById,
+      segmentOfferMappings,
+      addSegmentOfferMapping,
+      updateSegmentOfferMapping
     }}>
       {children}
     </AppContext.Provider>

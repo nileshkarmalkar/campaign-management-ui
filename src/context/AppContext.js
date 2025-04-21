@@ -86,6 +86,14 @@ export const AppProvider = ({ children }) => {
     ));
   };
 
+  const clearAllData = () => {
+    setCampaigns([]);
+    setTriggers([]);
+    setSegments([]);
+    setSegmentOfferMappings([]);
+    localStorage.clear();
+  };
+
   return (
     <AppContext.Provider value={{ 
       campaigns, 
@@ -100,7 +108,8 @@ export const AppProvider = ({ children }) => {
       getSegmentById,
       segmentOfferMappings,
       addSegmentOfferMapping,
-      updateSegmentOfferMapping
+      updateSegmentOfferMapping,
+      clearAllData
     }}>
       {children}
     </AppContext.Provider>

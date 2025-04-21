@@ -4,7 +4,7 @@ import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import CampaignForm from './CampaignForm';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 const Campaigns = () => {
   const [showForm, setShowForm] = useState(false);
@@ -125,8 +125,8 @@ const Campaigns = () => {
                 <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Campaign Metadata</Typography>
                 <Typography>Requestor: {campaign.requestorName}</Typography>
                 <Box display="flex" gap={2}>
-                  <Typography>Deployment Date: {campaign.deploymentDate ? format(campaign.deploymentDate, 'MMMM d, yyyy') : ''}</Typography>
-                  <Typography>End Date: {campaign.deploymentEndDate ? format(campaign.deploymentEndDate, 'MMMM d, yyyy') : ''}</Typography>
+                  <Typography>Deployment Date: {campaign.deploymentDate ? format(new Date(campaign.deploymentDate), 'MMMM d, yyyy') : ''}</Typography>
+                  <Typography>End Date: {campaign.deploymentEndDate ? format(new Date(campaign.deploymentEndDate), 'MMMM d, yyyy') : ''}</Typography>
                 </Box>
                 <Typography>
                   Business Unit: {campaign.businessUnit.map(unit => (

@@ -1,4 +1,27 @@
+const formatDate = (date) => {
+  if (!date) return null;
+  if (date instanceof Date) return date.toISOString();
+  return new Date(date).toISOString();
+};
+
 export const generatePayload = (type, data) => {
+  // Create a copy of data to avoid modifying the original
+  const processedData = { ...data };
+
+  // Convert date fields to ISO strings
+  if (processedData.deploymentDate) {
+    processedData.deploymentDate = formatDate(processedData.deploymentDate);
+  }
+  if (processedData.deploymentEndDate) {
+    processedData.deploymentEndDate = formatDate(processedData.deploymentEndDate);
+  }
+  if (processedData.startDate) {
+    processedData.startDate = formatDate(processedData.startDate);
+  }
+  if (processedData.endDate) {
+    processedData.endDate = formatDate(processedData.endDate);
+  }
+
   const basePayload = {
     type,
     timestamp: new Date().toISOString(),
@@ -9,25 +32,25 @@ export const generatePayload = (type, data) => {
     case 'offer':
       return {
         ...basePayload,
-        offerDetails: { ...data },
+        offerDetails: { ...processedData },
       };
     case 'trigger':
       return {
         ...basePayload,
-        triggerDetails: { ...data },
+        triggerDetails: { ...processedData },
       };
     case 'campaign':
       return {
         ...basePayload,
-        campaignDetails: { ...data },
+        campaignDetails: { ...processedData },
       };
     case 'segment':
       return {
         ...basePayload,
-        segmentDetails: { ...data },
+        segmentDetails: { ...processedData },
       };
     default:
-      return { ...basePayload, data };
+      return { ...basePayload, data: processedData };
   }
 };
 

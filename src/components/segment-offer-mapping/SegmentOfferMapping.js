@@ -20,7 +20,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { format } from 'date-fns';
 
 const SegmentOfferMapping = () => {
-  const { segmentOfferMappings, addSegmentOfferMapping, updateSegmentOfferMapping } = useAppContext();
+  const { segmentOfferMappings = [], addSegmentOfferMapping, updateSegmentOfferMapping } = useAppContext();
+  console.log('segmentOfferMappings:', segmentOfferMappings);
   const [formData, setFormData] = useState({
     segmentId: '',
     segmentName: '',
@@ -70,7 +71,7 @@ const SegmentOfferMapping = () => {
   };
 
   const filteredMappings = useMemo(() => {
-    return segmentOfferMappings.filter(mapping => 
+    return (segmentOfferMappings || []).filter(mapping => 
       mapping.segmentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       mapping.segmentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       mapping.offerId.toLowerCase().includes(searchTerm.toLowerCase()) ||

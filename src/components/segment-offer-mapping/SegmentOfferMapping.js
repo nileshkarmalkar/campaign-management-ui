@@ -14,7 +14,6 @@ import {
   TableRow,
   InputAdornment
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import SearchIcon from '@mui/icons-material/Search';
 import { format } from 'date-fns';
 
@@ -127,16 +126,17 @@ const SegmentOfferMapping = () => {
               />
             </Grid>
             <Grid item xs={12} sm={2}>
-              <DatePicker
+              <TextField
+                fullWidth
+                type="date"
                 label="Start Date"
-                value={formData.startDate}
-                onChange={handleDateChange}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    required: true
-                  }
+                name="startDate"
+                value={formData.startDate ? formData.startDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => handleDateChange(new Date(e.target.value))}
+                InputLabelProps={{
+                  shrink: true,
                 }}
+                required
               />
             </Grid>
             <Grid item xs={12} sm={2}>

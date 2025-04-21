@@ -9,8 +9,8 @@ import {
   Select,
   MenuItem
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useAppContext } from '../../context/AppContext';
-import DatePickerWrapper from '../../components/campaigns/DatePickerWrapper';
 
 const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   const { segments } = useAppContext();
@@ -111,23 +111,24 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <DatePickerWrapper
+          <DatePicker
             label="Start Date"
             value={formData.startDate}
             onChange={(newValue) => {
               setFormData({ ...formData, startDate: newValue });
             }}
-            required
+            renderInput={(params) => <TextField {...params} fullWidth required />}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <DatePickerWrapper
+          <DatePicker
             label="End Date"
             value={formData.endDate}
             onChange={(newValue) => {
               setFormData({ ...formData, endDate: newValue });
             }}
-            minDate={formData.startDate}
+            renderInput={(params) => <TextField {...params} fullWidth />}
+            minDate={formData.startDate || null}
           />
         </Grid>
         <Grid item xs={12}>

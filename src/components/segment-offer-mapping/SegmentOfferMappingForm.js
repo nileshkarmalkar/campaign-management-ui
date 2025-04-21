@@ -10,6 +10,7 @@ import {
   MenuItem
 } from '@mui/material';
 import { useAppContext } from '../../context/AppContext';
+import DatePickerWrapper from '../campaigns/DatePickerWrapper';
 
 const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   const { segments } = useAppContext();
@@ -18,8 +19,8 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
     segmentName: '',
     offerId: '',
     offerName: '',
-    startDate: '',
-    endDate: ''
+    startDate: null,
+    endDate: null
   });
 
   const handleInputChange = (event) => {
@@ -110,33 +111,23 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            type="date"
+          <DatePickerWrapper
             label="Start Date"
-            name="startDate"
             value={formData.startDate}
-            onChange={handleInputChange}
-            InputLabelProps={{
-              shrink: true,
+            onChange={(newValue) => {
+              setFormData({ ...formData, startDate: newValue });
             }}
             required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            type="date"
+          <DatePickerWrapper
             label="End Date"
-            name="endDate"
             value={formData.endDate}
-            onChange={handleInputChange}
-            InputLabelProps={{
-              shrink: true,
+            onChange={(newValue) => {
+              setFormData({ ...formData, endDate: newValue });
             }}
-            inputProps={{
-              min: formData.startDate // Ensure end date is after start date
-            }}
+            minDate={formData.startDate}
           />
         </Grid>
         <Grid item xs={12}>

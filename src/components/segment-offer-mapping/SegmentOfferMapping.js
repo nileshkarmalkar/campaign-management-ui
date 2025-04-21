@@ -5,20 +5,17 @@ import {
   TextField, 
   Button, 
   Paper, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow,
   InputAdornment,
   Box,
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Grid,
+  IconButton
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
 import { format } from 'date-fns';
 import SegmentOfferMappingForm from './SegmentOfferMappingForm';
 
@@ -118,47 +115,35 @@ const SegmentOfferMapping = () => {
           />
         </Paper>
       ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Segment ID</TableCell>
-                <TableCell>Segment Name</TableCell>
-                <TableCell>Offer ID</TableCell>
-                <TableCell>Offer Name</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Start Date</TableCell>
-                <TableCell>End Date</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredMappings.map((mapping) => (
-                <TableRow key={mapping.id}>
-                  <TableCell>{mapping.segmentId}</TableCell>
-                  <TableCell>{mapping.segmentName}</TableCell>
-                  <TableCell>{mapping.offerId}</TableCell>
-                  <TableCell>{mapping.offerName}</TableCell>
-                  <TableCell>{mapping.status}</TableCell>
-                  <TableCell>{mapping.startDate ? format(new Date(mapping.startDate), 'MM/dd/yyyy') : '-'}</TableCell>
-                  <TableCell>{mapping.endDate ? format(new Date(mapping.endDate), 'MM/dd/yyyy') : '-'}</TableCell>
-                  <TableCell>
-                    {mapping.status === 'Created' && (
-                      <Button onClick={() => handleStatusChange(mapping.id, 'Live')}>
-                        Set Live
-                      </Button>
-                    )}
-                    {mapping.status === 'Live' && (
-                      <Button onClick={() => handleStatusChange(mapping.id, 'Sunset')}>
-                        Sunset
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Grid container spacing={3}>
+          {filteredMappings.map((mapping) => (
+            <Grid item xs={12} key={mapping.id}>
+              <Paper style={{ padding: '20px' }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="h6">{mapping.segmentName} - {mapping.offerName}</Typography>
+                  <IconButton onClick={() => handleStatusChange(mapping.id, mapping.status === 'Created' ? 'Live' : 'Sunset')} color="primary">
+                    <EditIcon />
+                  </IconButton>
+                </Box>
+                <Typography>Segment ID: {mapping.segmentId}</Typography>
+                <Typography>Offer ID: {mapping.offerId}</Typography>
+                <Typography>Status: {mapping.status}</Typography>
+                <Typography>Start Date: {mapping.startDate ? format(new Date(mapping.startDate), 'MM/dd/yyyy') : '-'}</Typography>
+                <Typography>End Date: {mapping.endDate ? format(new Date(mapping.endDate), 'MM/dd/yyyy') : '-'}</Typography>
+                {mapping.status === 'Created' && (
+                  <Button onClick={() => handleStatusChange(mapping.id, 'Live')} variant="contained" color="primary" style={{ marginTop: '10px' }}>
+                    Set Live
+                  </Button>
+                )}
+                {mapping.status === 'Live' && (
+                  <Button onClick={() => handleStatusChange(mapping.id, 'Sunset')} variant="contained" color="secondary" style={{ marginTop: '10px' }}>
+                    Sunset
+                  </Button>
+                )}
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
       )}
     </div>
   );

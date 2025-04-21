@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   Button,
-  Grid
+  Grid,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
+import { useAppContext } from '../../context/AppContext';
 
-const SegmentOfferMappingForm = ({ open, handleClose, addSegmentOfferMapping }) => {
+const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
+  const { segments } = useAppContext();
   const [formData, setFormData] = useState({
     segmentId: '',
     segmentName: '',
     offerId: '',
     offerName: '',
-    startDate: null
+    startDate: '',
+    endDate: ''
   });
 
   const handleInputChange = (event) => {
@@ -23,16 +27,25 @@ const SegmentOfferMappingForm = ({ open, handleClose, addSegmentOfferMapping }) 
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleSegmentChange = (event) => {
+    const selectedSegment = segments.find(s => s.id === event.target.value);
+    if (selectedSegment) {
+      setFormData({
+        ...formData,
+        segmentId: selectedSegment.id.toString(),
+        segmentName: selectedSegment.segmentName
+      });
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const newMapping = {
+    onSubmit({
       ...formData,
       id: Date.now(),
       status: 'Created',
       endDate: null
-    };
-    addSegmentOfferMapping(newMapping);
-    handleClose();
+    });
     setFormData({
       segmentId: '',
       segmentName: '',
@@ -43,75 +56,99 @@ const SegmentOfferMappingForm = ({ open, handleClose, addSegmentOfferMapping }) 
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Create New Segment-Offer Mapping</DialogTitle>
-      <form onSubmit={handleSubmit}>
-        <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Segment ID"
-                name="segmentId"
-                value={formData.segmentId}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Segment Name"
-                name="segmentName"
-                value={formData.segmentName}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Offer ID"
-                name="offerId"
-                value={formData.offerId}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Offer Name"
-                name="offerName"
-                value={formData.offerName}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                type="date"
-                label="Start Date"
-                name="startDate"
-                value={formData.startDate || ''}
-                onChange={handleInputChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                required
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+    <form onSubmit={handleSubmit}>
+      <Typography variant="h6" gutterBottom>
+        Create New Segment-Offer Mapping
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth required>
+            <InputLabel>Select Segment</InputLabel>
+            <Select
+              value={formData.segmentId}
+              onChange={handleSegmentChange}
+              label="Select Segment"
+            >
+              {segments.map((segment) => (
+                <MenuItem key={segment.id} value={segment.id}>
+                  {segment.segmentName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Segment Name"
+            name="segmentName"
+            value={formData.segmentName}
+            InputProps={{
+              readOnly: true,
+            }}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Offer ID"
+            name="offerId"
+            value={formData.offerId}
+            onChange={handleInputChange}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Offer Name"
+            name="offerName"
+            value={formData.offerName}
+            onChange={handleInputChange}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            type="date"
+            label="Start Date"
+            name="startDate"
+            value={formData.startDate}
+            onChange={handleInputChange}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            type="date"
+            label="End Date"
+            name="endDate"
+            value={formData.endDate}
+            onChange={handleInputChange}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              min: formData.startDate // Ensure end date is after start date
+            }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button onClick={onCancel} style={{ marginRight: '10px' }}>
+            Cancel
+          </Button>
           <Button type="submit" variant="contained" color="primary">
             Create Mapping
           </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+        </Grid>
+      </Grid>
+    </form>
   );
 };
 

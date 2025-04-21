@@ -12,20 +12,38 @@ import {
   TableHead, 
   TableRow,
   InputAdornment,
-  Box
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
 import { format } from 'date-fns';
 import SegmentOfferMappingForm from './SegmentOfferMappingForm';
 
 const SegmentOfferMapping = () => {
-  const { segmentOfferMappings = [], addSegmentOfferMapping, updateSegmentOfferMapping } = useAppContext();
+  const { segmentOfferMappings = [], addSegmentOfferMapping, updateSegmentOfferMapping, segments } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
-  const [openForm, setOpenForm] = useState(false);
+  const [searchField, setSearchField] = useState('segmentName');
+  const [showForm, setShowForm] = useState(false);
 
-  const handleOpenForm = () => setOpenForm(true);
-  const handleCloseForm = () => setOpenForm(false);
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearchFieldChange = (event) => {
+    setSearchField(event.target.value);
+    setSearchTerm('');
+  };
+
+  const handleAddMapping = () => {
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+  };
 
   const handleStatusChange = (id, newStatus) => {
     const mappingToUpdate = segmentOfferMappings.find(mapping => mapping.id === id);
@@ -40,24 +58,35 @@ const SegmentOfferMapping = () => {
   };
 
   const filteredMappings = useMemo(() => {
-    return (segmentOfferMappings || []).filter(mapping => 
-      mapping.segmentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mapping.segmentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mapping.offerId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mapping.offerName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [segmentOfferMappings, searchTerm]);
+    return (segmentOfferMappings || []).filter(mapping => {
+      const searchValue = mapping[searchField]?.toString().toLowerCase() || '';
+      return searchValue.includes(searchTerm.toLowerCase());
+    });
+  }, [segmentOfferMappings, searchTerm, searchField]);
 
   return (
     <div>
       <Typography variant="h4" gutterBottom>
         Segment-Offer Mapping
       </Typography>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'flex-end' }}>
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel>Search By</InputLabel>
+          <Select
+            value={searchField}
+            onChange={handleSearchFieldChange}
+            label="Search By"
+          >
+            <MenuItem value="segmentName">Segment Name</MenuItem>
+            <MenuItem value="offerName">Offer Name</MenuItem>
+            <MenuItem value="status">Status</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
+          fullWidth
           label="Search Mappings"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleSearchChange}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -66,61 +95,71 @@ const SegmentOfferMapping = () => {
             ),
           }}
         />
+      </Box>
+      {!showForm && (
         <Button
           variant="contained"
           color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleOpenForm}
+          onClick={handleAddMapping}
+          style={{ marginBottom: '20px' }}
         >
           Add New Mapping
         </Button>
-      </Box>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Segment ID</TableCell>
-              <TableCell>Segment Name</TableCell>
-              <TableCell>Offer ID</TableCell>
-              <TableCell>Offer Name</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Start Date</TableCell>
-              <TableCell>End Date</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredMappings.map((mapping) => (
-              <TableRow key={mapping.id}>
-                <TableCell>{mapping.segmentId}</TableCell>
-                <TableCell>{mapping.segmentName}</TableCell>
-                <TableCell>{mapping.offerId}</TableCell>
-                <TableCell>{mapping.offerName}</TableCell>
-                <TableCell>{mapping.status}</TableCell>
-                <TableCell>{mapping.startDate ? format(new Date(mapping.startDate), 'MM/dd/yyyy') : '-'}</TableCell>
-                <TableCell>{mapping.endDate ? format(new Date(mapping.endDate), 'MM/dd/yyyy') : '-'}</TableCell>
-                <TableCell>
-                  {mapping.status === 'Created' && (
-                    <Button onClick={() => handleStatusChange(mapping.id, 'Live')}>
-                      Set Live
-                    </Button>
-                  )}
-                  {mapping.status === 'Live' && (
-                    <Button onClick={() => handleStatusChange(mapping.id, 'Sunset')}>
-                      Sunset
-                    </Button>
-                  )}
-                </TableCell>
+      )}
+      {showForm ? (
+        <Paper style={{ padding: '20px', marginBottom: '20px' }}>
+          <SegmentOfferMappingForm
+            onSubmit={(formData) => {
+              addSegmentOfferMapping(formData);
+              setShowForm(false);
+            }}
+            onCancel={handleCloseForm}
+            segments={segments}
+          />
+        </Paper>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Segment ID</TableCell>
+                <TableCell>Segment Name</TableCell>
+                <TableCell>Offer ID</TableCell>
+                <TableCell>Offer Name</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Start Date</TableCell>
+                <TableCell>End Date</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <SegmentOfferMappingForm
-        open={openForm}
-        handleClose={handleCloseForm}
-        addSegmentOfferMapping={addSegmentOfferMapping}
-      />
+            </TableHead>
+            <TableBody>
+              {filteredMappings.map((mapping) => (
+                <TableRow key={mapping.id}>
+                  <TableCell>{mapping.segmentId}</TableCell>
+                  <TableCell>{mapping.segmentName}</TableCell>
+                  <TableCell>{mapping.offerId}</TableCell>
+                  <TableCell>{mapping.offerName}</TableCell>
+                  <TableCell>{mapping.status}</TableCell>
+                  <TableCell>{mapping.startDate ? format(new Date(mapping.startDate), 'MM/dd/yyyy') : '-'}</TableCell>
+                  <TableCell>{mapping.endDate ? format(new Date(mapping.endDate), 'MM/dd/yyyy') : '-'}</TableCell>
+                  <TableCell>
+                    {mapping.status === 'Created' && (
+                      <Button onClick={() => handleStatusChange(mapping.id, 'Live')}>
+                        Set Live
+                      </Button>
+                    )}
+                    {mapping.status === 'Live' && (
+                      <Button onClick={() => handleStatusChange(mapping.id, 'Sunset')}>
+                        Sunset
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </div>
   );
 };

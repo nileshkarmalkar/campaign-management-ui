@@ -1,5 +1,6 @@
 import React from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TextField } from '@mui/material';
 
 const CustomDatePicker = ({ label, value, onChange, required = false, error = false, helperText = '', minDate = null }) => {
   return (
@@ -7,15 +8,16 @@ const CustomDatePicker = ({ label, value, onChange, required = false, error = fa
       label={label}
       value={value}
       onChange={onChange}
-      slotProps={{
-        textField: {
-          fullWidth: true,
-          required: required,
-          error: error,
-          helperText: helperText
-        }
-      }}
       minDate={minDate}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          fullWidth
+          required={required}
+          error={error}
+          helperText={helperText}
+        />
+      )}
     />
   );
 };

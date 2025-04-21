@@ -127,7 +127,9 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
             onChange={(newValue) => {
               setFormData({ ...formData, startDate: newValue });
             }}
-            renderInput={(params) => <TextField {...params} fullWidth required />}
+            slots={{
+              textField: (params) => <TextField {...params} fullWidth required />
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -137,7 +139,9 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
             onChange={(newValue) => {
               setFormData({ ...formData, endDate: newValue });
             }}
-            renderInput={(params) => <TextField {...params} fullWidth />}
+            slots={{
+              textField: (params) => <TextField {...params} fullWidth />
+            }}
             minDate={formData.startDate || null}
           />
         </Grid>

@@ -126,11 +126,8 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               label="Campaign Deployment Date"
               value={formData.deploymentDate}
               onChange={handleDateChange('deploymentDate')}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  required: true
-                }
+              slots={{
+                textField: (params) => <TextField {...params} fullWidth required />
               }}
             />
           </Grid>
@@ -139,13 +136,16 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               label="Campaign Deployment End Date"
               value={formData.deploymentEndDate}
               onChange={handleDateChange('deploymentEndDate')}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  required: true,
-                  error: !!dateErrors.deploymentEndDate,
-                  helperText: dateErrors.deploymentEndDate
-                }
+              slots={{
+                textField: (params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    required
+                    error={!!dateErrors.deploymentEndDate}
+                    helperText={dateErrors.deploymentEndDate}
+                  />
+                )
               }}
               minDate={formData.deploymentDate || null}
             />

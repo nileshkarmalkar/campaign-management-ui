@@ -1,12 +1,46 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const AppContext = createContext();
 
+const loadFromLocalStorage = (key, defaultValue) => {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : defaultValue;
+  } catch (error) {
+    console.error(`Error loading ${key} from localStorage:`, error);
+    return defaultValue;
+  }
+};
+
+const saveToLocalStorage = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error(`Error saving ${key} to localStorage:`, error);
+  }
+};
+
 export const AppProvider = ({ children }) => {
-  const [campaigns, setCampaigns] = useState([]);
-  const [triggers, setTriggers] = useState([]);
-  const [segments, setSegments] = useState([]);
-  const [segmentOfferMappings, setSegmentOfferMappings] = useState([]);
+  const [campaigns, setCampaigns] = useState(() => loadFromLocalStorage('campaigns', []));
+  const [triggers, setTriggers] = useState(() => loadFromLocalStorage('triggers', []));
+  const [segments, setSegments] = useState(() => loadFromLocalStorage('segments', []));
+  const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('segmentOfferMappings', []));
+
+  useEffect(() => {
+    saveToLocalStorage('campaigns', campaigns);
+  }, [campaigns]);
+
+  useEffect(() => {
+    saveToLocalStorage('triggers', triggers);
+  }, [triggers]);
+
+  useEffect(() => {
+    saveToLocalStorage('segments', segments);
+  }, [segments]);
+
+  useEffect(() => {
+    saveToLocalStorage('segmentOfferMappings', segmentOfferMappings);
+  }, [segmentOfferMappings]);
 
   const addCampaign = (campaign) => {
     setCampaigns([...campaigns, { ...campaign, id: Date.now() }]);

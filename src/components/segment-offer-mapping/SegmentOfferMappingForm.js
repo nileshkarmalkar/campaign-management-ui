@@ -10,7 +10,7 @@ import {
   MenuItem
 } from '@mui/material';
 import { useAppContext } from '../../context/AppContext';
-import DatePickerWrapper from '../campaigns/DatePickerWrapper';
+import DatePickerWrapper from '../../components/campaigns/DatePickerWrapper';
 
 const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   const { segments } = useAppContext();

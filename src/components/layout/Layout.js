@@ -9,7 +9,7 @@ const menuItems = [
   { text: 'Campaigns', icon: <Campaign />, path: '/campaigns' },
   { text: 'Triggers', icon: <NotificationsActive />, path: '/triggers' },
   { text: 'Segments', icon: <Segment />, path: '/segments' },
-  { text: 'Offers', icon: <LocalOffer />, path: '/offers' },
+  { text: 'Offers', icon: <LocalOffer />, path: '/segment-offer-mapping' },
   { text: 'Communications', icon: <Message />, path: '/communications' },
 ];
 

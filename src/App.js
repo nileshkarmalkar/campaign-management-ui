@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -7,9 +7,9 @@ import { AppProvider } from './context/AppContext';
 import Layout from './components/layout/Layout';
 import Campaigns from './components/campaigns/Campaigns';
 import Segments from './components/segments/Segments';
-import Offers from './components/offers/Offers';
 import Communications from './components/communications/Communications';
 import Triggers from './components/triggers/Triggers';
+import SegmentOfferMapping from './components/segment-offer-mapping/SegmentOfferMapping';
 import './App.css';
 
 const theme = createTheme({
@@ -32,18 +32,18 @@ function App() {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <BrowserRouter>
+          <HashRouter>
         <Layout>
           <Routes>
             <Route path="/campaigns" element={<Campaigns />} />
             <Route path="/segments" element={<Segments />} />
-            <Route path="/offers" element={<Offers />} />
             <Route path="/communications" element={<Communications />} />
           <Route path="/triggers" element={<Triggers />} />
-            <Route path="/" element={<Navigate to="/campaigns" replace />} />
+          <Route path="/segment-offer-mapping" element={<SegmentOfferMapping />} />
+          <Route path="/" element={<Navigate to="/campaigns" replace />} />
           </Routes>
         </Layout>
-          </BrowserRouter>
+          </HashRouter>
         </ThemeProvider>
       </LocalizationProvider>
     </AppProvider>

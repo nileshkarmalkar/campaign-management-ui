@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Campaign, Segment, LocalOffer, Message, NotificationsActive } from '@mui/icons-material';
+import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 
 const drawerWidth = 240;
 
 const menuItems = [
+  { text: 'Workflow', icon: <WorkOutline />, path: '/workflow' },
   { text: 'Campaigns', icon: <Campaign />, path: '/campaigns' },
   { text: 'Triggers', icon: <NotificationsActive />, path: '/triggers' },
   { text: 'Segments', icon: <Segment />, path: '/segments' },

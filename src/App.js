@@ -2,7 +2,8 @@ import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 import { AppProvider } from './context/AppContext';
 import Layout from './components/layout/Layout';
 import Campaigns from './components/campaigns/Campaigns';
@@ -30,7 +31,7 @@ const theme = createTheme({
 function App() {
   return (
     <AppProvider>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} dateLibInstance={dayjs}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <HashRouter>

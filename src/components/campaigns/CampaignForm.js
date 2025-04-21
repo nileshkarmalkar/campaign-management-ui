@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select, OutlinedInput, Checkbox, ListItemText, FormControlLabel, Typography, Divider, Box } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import CustomDatePicker from '../common/CustomDatePicker';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
 
@@ -122,31 +122,21 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <DatePicker
+            <CustomDatePicker
               label="Campaign Deployment Date"
               value={formData.deploymentDate}
               onChange={handleDateChange('deploymentDate')}
-              slots={{
-                textField: (params) => <TextField {...params} fullWidth required />
-              }}
+              required
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <DatePicker
+            <CustomDatePicker
               label="Campaign Deployment End Date"
               value={formData.deploymentEndDate}
               onChange={handleDateChange('deploymentEndDate')}
-              slots={{
-                textField: (params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    required
-                    error={!!dateErrors.deploymentEndDate}
-                    helperText={dateErrors.deploymentEndDate}
-                  />
-                )
-              }}
+              required
+              error={!!dateErrors.deploymentEndDate}
+              helperText={dateErrors.deploymentEndDate}
               minDate={formData.deploymentDate || null}
             />
           </Grid>

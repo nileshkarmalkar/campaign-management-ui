@@ -10,7 +10,7 @@ import {
   MenuItem,
   Box
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import CustomDatePicker from '../common/CustomDatePicker';
 import { useAppContext } from '../../context/AppContext';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
@@ -121,26 +121,21 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <DatePicker
+          <CustomDatePicker
             label="Start Date"
             value={formData.startDate}
             onChange={(newValue) => {
               setFormData({ ...formData, startDate: newValue });
             }}
-            slots={{
-              textField: (params) => <TextField {...params} fullWidth required />
-            }}
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <DatePicker
+          <CustomDatePicker
             label="End Date"
             value={formData.endDate}
             onChange={(newValue) => {
               setFormData({ ...formData, endDate: newValue });
-            }}
-            slots={{
-              textField: (params) => <TextField {...params} fullWidth />
             }}
             minDate={formData.startDate || null}
           />

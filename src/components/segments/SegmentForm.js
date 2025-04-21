@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment } from '@mui/material';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
+import PayloadViewer from '../PayloadViewer';
 
 const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
   const [formData, setFormData] = useState(
@@ -38,15 +39,19 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
     }
   };
 
+  const [generatedPayload, setGeneratedPayload] = useState(null);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const payload = generatePayload('segment', formData);
     logPayload(payload);
+    setGeneratedPayload(payload);
     onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
+      <form onSubmit={handleSubmit}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <TextField
@@ -297,7 +302,9 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
           </Button>
         </Grid>
       </Grid>
-    </form>
+      </form>
+      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+    </>
   );
 };
 

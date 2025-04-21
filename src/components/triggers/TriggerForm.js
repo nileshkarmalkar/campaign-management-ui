@@ -3,6 +3,7 @@ import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Typ
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
+import PayloadViewer from '../PayloadViewer';
 
 const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
   const [formData, setFormData] = useState(
@@ -24,15 +25,19 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const [generatedPayload, setGeneratedPayload] = useState(null);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const payload = generatePayload('trigger', formData);
     logPayload(payload);
+    setGeneratedPayload(payload);
     onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
+      <form onSubmit={handleSubmit}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Typography variant="h6">Trigger Details</Typography>
@@ -181,7 +186,9 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
           </Button>
         </Grid>
       </Grid>
-    </form>
+      </form>
+      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+    </>
   );
 };
 

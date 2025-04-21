@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select, OutlinedInput, Checkbox, ListItemText, FormControlLabel, Typography, Divider } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
+import PayloadViewer from '../PayloadViewer';
 
 const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
   const [formData, setFormData] = useState(
@@ -79,18 +80,22 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
     validateDates(newFormData);
   };
 
+  const [generatedPayload, setGeneratedPayload] = useState(null);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     if (validateDates(formData)) {
       const payload = generatePayload('campaign', formData);
       logPayload(payload);
+      setGeneratedPayload(payload);
       onSubmit(formData);
     }
   };
 
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
+      <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Typography variant="h6">Campaign Metadata</Typography>
@@ -453,6 +458,8 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
           </Grid>
         </Grid>
       </form>
+      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+    </>
   );
 };
 

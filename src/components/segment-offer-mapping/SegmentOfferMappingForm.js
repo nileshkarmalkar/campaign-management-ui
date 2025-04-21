@@ -12,6 +12,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useAppContext } from '../../context/AppContext';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
+import PayloadViewer from '../PayloadViewer';
 
 const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   const { segments } = useAppContext();
@@ -40,6 +41,8 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
     }
   };
 
+  const [generatedPayload, setGeneratedPayload] = useState(null);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const submitData = {
@@ -50,6 +53,7 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
     };
     const payload = generatePayload('offer', submitData);
     logPayload(payload);
+    setGeneratedPayload(payload);
     onSubmit(submitData);
     setFormData({
       segmentId: '',
@@ -61,7 +65,8 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
+      <form onSubmit={handleSubmit}>
       <Typography variant="h6" gutterBottom>
         Create New Segment-Offer Mapping
       </Typography>
@@ -144,7 +149,9 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
           </Button>
         </Grid>
       </Grid>
-    </form>
+      </form>
+      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+    </>
   );
 };
 

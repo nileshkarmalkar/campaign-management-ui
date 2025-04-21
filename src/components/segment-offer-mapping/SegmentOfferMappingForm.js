@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useAppContext } from '../../context/AppContext';
+import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 
 const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   const { segments } = useAppContext();
@@ -41,12 +42,15 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onSubmit({
+    const submitData = {
       ...formData,
       id: Date.now(),
       status: 'Created',
       endDate: null
-    });
+    };
+    const payload = generatePayload('offer', submitData);
+    logPayload(payload);
+    onSubmit(submitData);
     setFormData({
       segmentId: '',
       segmentName: '',

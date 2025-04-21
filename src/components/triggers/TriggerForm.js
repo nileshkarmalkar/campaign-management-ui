@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Typography, Divider, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 
 const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
   const [formData, setFormData] = useState(
@@ -25,6 +26,8 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const payload = generatePayload('trigger', formData);
+    logPayload(payload);
     onSubmit(formData);
   };
 

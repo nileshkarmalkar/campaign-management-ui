@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment } from '@mui/material';
+import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 
 const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
   const [formData, setFormData] = useState(
@@ -39,6 +40,8 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const payload = generatePayload('segment', formData);
+    logPayload(payload);
     onSubmit(formData);
   };
 

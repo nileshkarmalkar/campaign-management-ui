@@ -1,1 +1,75 @@
-/* Add any custom styles here */
+/* TELUS Brand Styles */
+
+/* Global Styles */
+body {
+  background-color: #FFFFFF;
+  color: #2A2C2E;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F7F8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4B286D;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7C5AA6;
+}
+
+/* Link Styles */
+a {
+  color: #4B286D;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #7C5AA6;
+}
+
+/* Focus Styles */
+*:focus {
+  outline: 2px solid #2B8000;
+  outline-offset: 2px;
+}
+
+/* Selection Styles */
+::selection {
+  background: #4B286D;
+  color: #FFFFFF;
+}
+
+/* Transition Styles */
+.MuiButton-root,
+.MuiIconButton-root,
+.MuiListItem-root {
+  transition: all 0.2s ease !important;
+}
+
+/* Active Navigation Item */
+.MuiListItem-root.Mui-selected {
+  background-color: rgba(75, 40, 109, 0.08) !important;
+}
+
+.MuiListItem-root.Mui-selected:hover {
+  background-color: rgba(75, 40, 109, 0.12) !important;
+}
+
+/* Form Controls */
+.MuiFormControl-root {
+  margin-bottom: 16px !important;
+}
+
+/* Paper Elements */
+.MuiPaper-root {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}

@@ -14,7 +14,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText
+  DialogContentText,
+  SvgIcon
 } from '@mui/material';
 import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
@@ -30,6 +31,12 @@ const menuItems = [
   { text: 'Offers', icon: <LocalOffer />, path: '/segment-offer-mapping' },
   { text: 'Communications', icon: <Message />, path: '/communications' },
 ];
+
+const TelusLogo = (props) => (
+  <SvgIcon {...props} viewBox="0 0 400 80">
+    <text x="10" y="60" fontFamily="Arial Black" fontSize="60" fill="#4B286D">TELUS</text>
+  </SvgIcon>
+);
 
 const Layout = ({ children }) => {
   const { clearAllData } = useAppContext();
@@ -50,13 +57,14 @@ const Layout = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, bgcolor: '#FFFFFF' }}>
         <Toolbar>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <TelusLogo sx={{ fontSize: 40, mr: 2 }} />
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: '#4B286D' }}>
             Campaign Management
           </Typography>
           <Button
-            color="error"
+            color="secondary"
             startIcon={<DeleteOutline />}
             onClick={handleClearData}
             variant="contained"
@@ -74,6 +82,7 @@ const Layout = ({ children }) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
+            bgcolor: '#F7F7F8',
           },
         }}
       >
@@ -82,30 +91,36 @@ const Layout = ({ children }) => {
           <List>
             {menuItems.map((item) => (
               <ListItem button key={item.text} component={RouterLink} to={item.path}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
+                <ListItemIcon sx={{ color: '#4B286D' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} sx={{ color: '#2A2C2E' }} />
               </ListItem>
             ))}
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, bgcolor: '#FFFFFF' }}>
         <Toolbar />
         {children}
       </Box>
       <Dialog
         open={openDialog}
         onClose={handleCancelClear}
+        PaperProps={{
+          style: {
+            backgroundColor: '#FFFFFF',
+            borderRadius: '8px',
+          },
+        }}
       >
-        <DialogTitle>Clear All Data?</DialogTitle>
+        <DialogTitle sx={{ color: '#4B286D' }}>Clear All Data?</DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText sx={{ color: '#2A2C2E' }}>
             This will permanently delete all campaigns, triggers, segments, and mappings. This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelClear}>Cancel</Button>
-          <Button onClick={handleConfirmClear} color="error" variant="contained">
+          <Button onClick={handleCancelClear} sx={{ color: '#4B286D' }}>Cancel</Button>
+          <Button onClick={handleConfirmClear} color="secondary" variant="contained">
             Clear All Data
           </Button>
         </DialogActions>

@@ -29,13 +29,25 @@ A React-based web application for managing marketing campaigns, segments, trigge
 - Define trigger conditions and rules
 - Link triggers to segments and campaigns
 
-### 4. Segment-Offer Mapping
+### 4. Communications Management
+- Configure communication templates and content
+- Set up email, SMS, and direct mail communications
+- Define communication schedules and frequencies
+- Track communication status and history
+
+### 5. Segment-Offer Mapping
 - Map segments to specific offers
 - Set validity periods for offers
 - Track mapping status (Created, Live, Sunset)
 - Manage offer deployment schedules
 
-### 5. Campaign Workflow
+### 6. Payload Generation & Viewing
+- Generate standardized JSON payloads for campaign data
+- Real-time payload preview and validation
+- Export payload data for external systems
+- Track payload version history
+
+### 7. Campaign Workflow
 - Guided workflow for campaign creation
 - Step-by-step process:
   1. Create Campaign
@@ -43,17 +55,19 @@ A React-based web application for managing marketing campaigns, segments, trigge
   3. Configure Triggers
   4. Map Offers
 
-### 6. Data Persistence
+### 8. Data Persistence
 - All data is automatically saved to browser's localStorage
 - Data persists across page refreshes and browser sessions
 - Clear All Data functionality for testing and reset
 
 ## Technical Features
 
-- Built with React and Material-UI
+- Built with React 18 and Material-UI v5
 - Responsive design for desktop and mobile
 - Component-based architecture
 - Context API for state management
+- Custom hooks for business logic
+- Payload generation utilities
 - Date handling with @mui/x-date-pickers
 - Form validation and error handling
 - Search and filter capabilities
@@ -100,16 +114,22 @@ A React-based web application for managing marketing campaigns, segments, trigge
 
 ```
 src/
+├── assets/
 ├── components/
 │   ├── campaigns/
+│   ├── communications/
+│   ├── common/
+│   ├── layout/
+│   ├── offers/
 │   ├── segments/
-│   ├── triggers/
 │   ├── segment-offer-mapping/
-│   ├── workflow/
-│   └── layout/
+│   ├── triggers/
+│   └── workflow/
 ├── context/
 │   └── AppContext.js
 ├── utils/
+│   ├── dayjsSetup.js
+│   └── payloadGenerator.js
 ├── App.js
 └── index.js
 ```

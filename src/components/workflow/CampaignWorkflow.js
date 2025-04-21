@@ -10,6 +10,7 @@ import {
   StepContent,
   StepButton
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import CampaignForm from '../campaigns/CampaignForm';
 import SegmentForm from '../segments/SegmentForm';
 import TriggerForm from '../triggers/TriggerForm';
@@ -34,6 +35,24 @@ const steps = [
     description: 'Associate offers with your segments for this campaign.'
   }
 ];
+
+const TelусStepLabel = styled(StepLabel)(({ theme }) => ({
+  '& .MuiStepLabel-label': {
+    color: theme.palette.text.primary,
+  },
+  '& .MuiStepLabel-label.Mui-active': {
+    color: theme.palette.primary.main,
+  },
+  '& .MuiStepLabel-label.Mui-completed': {
+    color: theme.palette.secondary.main,
+  },
+}));
+
+const TelусStepButton = styled(StepButton)(({ theme }) => ({
+  '&:hover': {
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
 
 const CampaignWorkflow = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -125,7 +144,7 @@ const CampaignWorkflow = () => {
 
   return (
     <Box sx={{ maxWidth: 1200, margin: '0 auto', padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ color: 'primary.main' }}>
         Campaign Setup Workflow
       </Typography>
       <Typography variant="subtitle1" color="text.secondary" paragraph>
@@ -135,16 +154,16 @@ const CampaignWorkflow = () => {
       <Stepper nonLinear activeStep={activeStep} orientation="vertical">
         {steps.map((step, index) => (
           <Step key={step.label} completed={completed[index]}>
-            <StepButton onClick={handleStep(index)}>
-              <StepLabel>
+            <TelусStepButton onClick={handleStep(index)}>
+              <TelусStepLabel>
                 <Typography variant="subtitle1">{step.label}</Typography>
-              </StepLabel>
-            </StepButton>
+              </TelусStepLabel>
+            </TelусStepButton>
             <StepContent>
               <Typography color="text.secondary" paragraph>
                 {step.description}
               </Typography>
-              <Paper sx={{ p: 3, bgcolor: 'background.default' }}>
+              <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
                 {getStepContent(index)}
               </Paper>
               <Box sx={{ mb: 2, mt: 2 }}>
@@ -153,13 +172,14 @@ const CampaignWorkflow = () => {
                     variant="contained"
                     onClick={handleNext}
                     sx={{ mt: 1, mr: 1 }}
+                    color="secondary"
                   >
                     {index === steps.length - 1 ? 'Finish' : 'Continue'}
                   </Button>
                   <Button
                     disabled={index === 0}
                     onClick={handleBack}
-                    sx={{ mt: 1, mr: 1 }}
+                    sx={{ mt: 1, mr: 1, color: 'primary.main' }}
                   >
                     Back
                   </Button>
@@ -170,9 +190,9 @@ const CampaignWorkflow = () => {
         ))}
       </Stepper>
       {activeStep === steps.length && (
-        <Paper square elevation={0} sx={{ p: 3 }}>
-          <Typography>All steps completed - you&apos;re finished</Typography>
-          <Button onClick={() => setActiveStep(0)} sx={{ mt: 1, mr: 1 }}>
+        <Paper square elevation={0} sx={{ p: 3, bgcolor: 'background.paper' }}>
+          <Typography sx={{ color: 'secondary.main' }}>All steps completed - you&apos;re finished</Typography>
+          <Button onClick={() => setActiveStep(0)} sx={{ mt: 1, mr: 1, color: 'primary.main' }}>
             Reset
           </Button>
         </Paper>

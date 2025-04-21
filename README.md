@@ -1,70 +1,127 @@
-# Getting Started with Create React App
+# Campaign Management UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based web application for managing marketing campaigns, segments, triggers, and offer mappings. The application provides a streamlined workflow for creating and managing marketing campaigns across different channels.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### 1. Campaign Management
+- Create and manage marketing campaigns
+- Set deployment dates and end dates
+- Define campaign metadata:
+  - Campaign name and code
+  - Business unit and campaign type
+  - Target bases and segments per base
+  - Medium/channels (Email, SMS, Direct Mail, etc.)
+  - Marcomm Prime information
 
-### `npm start`
+### 2. Segment Management
+- Create and manage customer segments
+- Define segment criteria:
+  - Brand selection (TELUS, Koodo)
+  - Line of Business (Mobility, Home Solution, etc.)
+  - Account types and sub-types
+  - Geographic targeting
+  - MSF (Monthly Service Fee) amount ranges
+  - Number of subscribers
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 3. Trigger Management
+- Set up and manage campaign triggers
+- Define trigger conditions and rules
+- Link triggers to segments and campaigns
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 4. Segment-Offer Mapping
+- Map segments to specific offers
+- Set validity periods for offers
+- Track mapping status (Created, Live, Sunset)
+- Manage offer deployment schedules
 
-### `npm test`
+### 5. Campaign Workflow
+- Guided workflow for campaign creation
+- Step-by-step process:
+  1. Create Campaign
+  2. Define Segment
+  3. Configure Triggers
+  4. Map Offers
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 6. Data Persistence
+- All data is automatically saved to browser's localStorage
+- Data persists across page refreshes and browser sessions
+- Clear All Data functionality for testing and reset
 
-### `npm run build`
+## Technical Features
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Built with React and Material-UI
+- Responsive design for desktop and mobile
+- Component-based architecture
+- Context API for state management
+- Date handling with @mui/x-date-pickers
+- Form validation and error handling
+- Search and filter capabilities
+- Card-based UI for better data visualization
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/campaign-management-ui.git
+   ```
 
-### `npm run eject`
+2. Install dependencies:
+   ```bash
+   cd campaign-management-ui
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Build for production:
+   ```bash
+   npm run build
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+5. Deploy to GitHub Pages:
+   ```bash
+   npm run deploy
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Dependencies
 
-## Learn More
+- React
+- Material-UI (@mui/material)
+- @mui/x-date-pickers
+- date-fns
+- react-router-dom
+- gh-pages (for deployment)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Project Structure
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+src/
+├── components/
+│   ├── campaigns/
+│   ├── segments/
+│   ├── triggers/
+│   ├── segment-offer-mapping/
+│   ├── workflow/
+│   └── layout/
+├── context/
+│   └── AppContext.js
+├── utils/
+├── App.js
+└── index.js
+```
 
-### Code Splitting
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-### Analyzing the Bundle Size
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the MIT License - see the LICENSE file for details.

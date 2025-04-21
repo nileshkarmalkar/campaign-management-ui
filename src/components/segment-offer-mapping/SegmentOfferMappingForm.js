@@ -7,7 +7,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Box
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useAppContext } from '../../context/AppContext';
@@ -66,10 +67,10 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Create New Segment-Offer Mapping
       </Typography>
+      <form onSubmit={handleSubmit}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth required>
@@ -150,7 +151,14 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
         </Grid>
       </Grid>
       </form>
-      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+      {generatedPayload && (
+        <Box sx={{ mt: 4, mb: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Generated Payload
+          </Typography>
+          <PayloadViewer payload={generatedPayload} />
+        </Box>
+      )}
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment } from '@mui/material';
+import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment, Typography, Box } from '@mui/material';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
 
@@ -51,6 +51,9 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
 
   return (
     <>
+      <Typography variant="h5" gutterBottom>
+        {initialData ? 'Edit Segment' : 'Create New Segment'}
+      </Typography>
       <form onSubmit={handleSubmit}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -303,7 +306,14 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
         </Grid>
       </Grid>
       </form>
-      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+      {generatedPayload && (
+        <Box sx={{ mt: 4, mb: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Generated Payload
+          </Typography>
+          <PayloadViewer payload={generatedPayload} />
+        </Box>
+      )}
     </>
   );
 };

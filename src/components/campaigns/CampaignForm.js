@@ -126,7 +126,12 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               label="Campaign Deployment Date"
               value={formData.deploymentDate}
               onChange={handleDateChange('deploymentDate')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  required: true
+                }
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -134,15 +139,14 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               label="Campaign Deployment End Date"
               value={formData.deploymentEndDate}
               onChange={handleDateChange('deploymentEndDate')}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  fullWidth
-                  required
-                  error={!!dateErrors.deploymentEndDate}
-                  helperText={dateErrors.deploymentEndDate}
-                />
-              )}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  required: true,
+                  error: !!dateErrors.deploymentEndDate,
+                  helperText: dateErrors.deploymentEndDate
+                }
+              }}
               minDate={formData.deploymentDate || null}
             />
           </Grid>
@@ -458,7 +462,14 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
           </Grid>
         </Grid>
       </form>
-      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+      {generatedPayload && (
+        <Box sx={{ mt: 4, mb: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Generated Payload
+          </Typography>
+          <PayloadViewer payload={generatedPayload} />
+        </Box>
+      )}
     </>
   );
 };

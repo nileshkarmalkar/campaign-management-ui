@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Typography, Divider, IconButton } from '@mui/material';
+import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Typography, Divider, IconButton, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
@@ -37,6 +37,9 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
 
   return (
     <>
+      <Typography variant="h5" gutterBottom>
+        {initialData ? 'Edit Trigger' : 'Create New Trigger'}
+      </Typography>
       <form onSubmit={handleSubmit}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -187,7 +190,14 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
         </Grid>
       </Grid>
       </form>
-      {generatedPayload && <PayloadViewer payload={generatedPayload} />}
+      {generatedPayload && (
+        <Box sx={{ mt: 4, mb: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Generated Payload
+          </Typography>
+          <PayloadViewer payload={generatedPayload} />
+        </Box>
+      )}
     </>
   );
 };

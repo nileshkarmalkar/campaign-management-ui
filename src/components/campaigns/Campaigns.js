@@ -129,9 +129,12 @@ const Campaigns = () => {
                   <Typography>End Date: {campaign.deploymentEndDate ? format(new Date(campaign.deploymentEndDate), 'MMMM d, yyyy') : ''}</Typography>
                 </Box>
                 <Typography>
-                  Business Unit: {campaign.businessUnit.map(unit => (
-                    <Chip key={unit} label={unit} style={{marginRight: '5px'}} />
-                  ))}
+                  Business Unit: {Array.isArray(campaign.businessUnit) 
+                    ? campaign.businessUnit.map(unit => (
+                        <Chip key={unit} label={unit} style={{marginRight: '5px'}} />
+                      ))
+                    : <Chip label={campaign.businessUnit} style={{marginRight: '5px'}} />
+                  }
                 </Typography>
                 <Typography>Campaign Type: {campaign.campaignType}</Typography>
                 <Typography>Campaign Code: {campaign.campaignCode}</Typography>
@@ -139,37 +142,69 @@ const Campaigns = () => {
                 <Typography>Marcomm Prime: {campaign.marcommPrime}</Typography>
                 
                 <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Inclusion Criteria</Typography>
-                <Typography>
-                  Brand: {campaign.brand.map(b => (
-                    <Chip key={b} label={b} style={{marginRight: '5px'}} />
-                  ))}
-                </Typography>
-                <Typography>
-                  Line of Business: {campaign.lineOfBusiness.map(lob => (
-                    <Chip key={lob} label={lob} style={{marginRight: '5px'}} />
-                  ))}
-                </Typography>
-                <Typography>Contract Expiry Duration: {campaign.contractExpiryDuration} month(s)</Typography>
-                <Typography>
-                  Language: {campaign.language.map(lang => (
-                    <Chip key={lang} label={lang} style={{marginRight: '5px'}} />
-                  ))}
-                </Typography>
-                <Typography>
-                  Prepaid/Postpaid: {campaign.prepaidPostpaid.map(option => (
-                    <Chip key={option} label={option} style={{marginRight: '5px'}} />
-                  ))}
-                </Typography>
-                <Typography>BYOD: {campaign.byod ? 'Yes' : 'No'}</Typography>
-                <Typography>MTM: {campaign.mtm ? 'Yes' : 'No'}</Typography>
+                {campaign.brand && (
+                  <Typography>
+                    Brand: {Array.isArray(campaign.brand) 
+                      ? campaign.brand.map(b => (
+                          <Chip key={b} label={b} style={{marginRight: '5px'}} />
+                        ))
+                      : <Chip label={campaign.brand} style={{marginRight: '5px'}} />
+                    }
+                  </Typography>
+                )}
+                {campaign.lineOfBusiness && (
+                  <Typography>
+                    Line of Business: {Array.isArray(campaign.lineOfBusiness)
+                      ? campaign.lineOfBusiness.map(lob => (
+                          <Chip key={lob} label={lob} style={{marginRight: '5px'}} />
+                        ))
+                      : <Chip label={campaign.lineOfBusiness} style={{marginRight: '5px'}} />
+                    }
+                  </Typography>
+                )}
+                {campaign.contractExpiryDuration && (
+                  <Typography>Contract Expiry Duration: {campaign.contractExpiryDuration} month(s)</Typography>
+                )}
+                {campaign.language && (
+                  <Typography>
+                    Language: {Array.isArray(campaign.language)
+                      ? campaign.language.map(lang => (
+                          <Chip key={lang} label={lang} style={{marginRight: '5px'}} />
+                        ))
+                      : <Chip label={campaign.language} style={{marginRight: '5px'}} />
+                    }
+                  </Typography>
+                )}
+                {campaign.prepaidPostpaid && (
+                  <Typography>
+                    Prepaid/Postpaid: {Array.isArray(campaign.prepaidPostpaid)
+                      ? campaign.prepaidPostpaid.map(option => (
+                          <Chip key={option} label={option} style={{marginRight: '5px'}} />
+                        ))
+                      : <Chip label={campaign.prepaidPostpaid} style={{marginRight: '5px'}} />
+                    }
+                  </Typography>
+                )}
+                {campaign.byod !== undefined && (
+                  <Typography>BYOD: {campaign.byod ? 'Yes' : 'No'}</Typography>
+                )}
+                {campaign.mtm !== undefined && (
+                  <Typography>MTM: {campaign.mtm ? 'Yes' : 'No'}</Typography>
+                )}
 
-                <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Exclusion Criteria</Typography>
-                <Typography>
-                  Renewal Window: {campaign.renewalWindow.operator} {campaign.renewalWindow.value} days
-                </Typography>
-                <Typography>
-                  Contact Strategy Rule: {campaign.contactStrategyRule.operator} {campaign.contactStrategyRule.value} days
-                </Typography>
+                {campaign.renewalWindow && (
+                  <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Exclusion Criteria</Typography>
+                )}
+                {campaign.renewalWindow && (
+                  <Typography>
+                    Renewal Window: {campaign.renewalWindow.operator} {campaign.renewalWindow.value} days
+                  </Typography>
+                )}
+                {campaign.contactStrategyRule && (
+                  <Typography>
+                    Contact Strategy Rule: {campaign.contactStrategyRule.operator} {campaign.contactStrategyRule.value} days
+                  </Typography>
+                )}
               </Paper>
             </Grid>
           ))}

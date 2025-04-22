@@ -31,11 +31,11 @@ export const sampleSegments = [
   {
     id: 'seg_001',
     name: 'High-Value Mobility Customers',
-    brand: 'TELUS',
-    lineOfBusiness: 'Mobility',
-    accountType: 'Consumer',
-    accountSubType: 'Postpaid',
-    geography: 'National',
+    brand: ['TELUS'],
+    lineOfBusiness: ['Mobility'],
+    accountType: ['Consumer'],
+    accountSubType: ['Postpaid'],
+    geography: ['National'],
     msfRange: {
       min: 70,
       max: 150
@@ -49,11 +49,11 @@ export const sampleSegments = [
   {
     id: 'seg_002',
     name: 'Internet-Only Customers',
-    brand: 'TELUS',
-    lineOfBusiness: 'Home Solutions',
-    accountType: 'Consumer',
-    accountSubType: 'Internet',
-    geography: 'Ontario',
+    brand: ['TELUS'],
+    lineOfBusiness: ['Home Solutions'],
+    accountType: ['Consumer'],
+    accountSubType: ['Internet'],
+    geography: ['Ontario'],
     msfRange: {
       min: 85,
       max: 120

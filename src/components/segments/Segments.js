@@ -140,36 +140,66 @@ const Segments = () => {
                 <Typography style={{ color: getStatusColor(segment.status) }}>
                   Status: {segment.status}
                 </Typography>
-                <Typography>Brand: {segment.brand.join(', ')}</Typography>
-                <Typography>Line of Business: {segment.lineOfBusiness.join(', ')}</Typography>
-                <Typography>Account Type: {segment.accountType.join(', ')}</Typography>
-                <Typography>Account Sub-type: {segment.accountSubType.join(', ')}</Typography>
-                <Typography>Number of Subscribers: {segment.numberOfSubscribers}</Typography>
-                <Typography>Geography: {segment.geography.join(', ')}</Typography>
                 <Typography>
-                  MSF Amount: {(() => {
-                    const { operator, value1, value2 } = segment.msfAmount;
-                    switch (operator) {
-                      case '>=':
-                        return `≥ $${value1}`;
-                      case '<=':
-                        return `≤ $${value1}`;
-                      case '=':
-                        return `= $${value1}`;
-                      case 'between':
-                        return `$${value1} - $${value2}`;
-                      default:
-                        return 'Not specified';
-                    }
-                  })()}
+                  Brand: {Array.isArray(segment.brand) 
+                    ? segment.brand.join(', ')
+                    : segment.brand}
                 </Typography>
                 <Typography>
-                  Triggers: {segment.triggers.map(t => {
-                    const trigger = triggers.find(trigger => trigger.id === t);
-                    return trigger ? `${trigger.triggerName} (${trigger.type})` : '';
-                  }).filter(Boolean).join(', ')}
+                  Line of Business: {Array.isArray(segment.lineOfBusiness)
+                    ? segment.lineOfBusiness.join(', ')
+                    : segment.lineOfBusiness}
                 </Typography>
-                <Typography>Existing Segments: {segment.existingSegments.map(s => segments.find(seg => seg.id === s)?.segmentName).join(', ')}</Typography>
+                <Typography>
+                  Account Type: {Array.isArray(segment.accountType)
+                    ? segment.accountType.join(', ')
+                    : segment.accountType}
+                </Typography>
+                <Typography>
+                  Account Sub-type: {Array.isArray(segment.accountSubType)
+                    ? segment.accountSubType.join(', ')
+                    : segment.accountSubType}
+                </Typography>
+                {segment.numberOfSubscribers && (
+                  <Typography>Number of Subscribers: {segment.numberOfSubscribers}</Typography>
+                )}
+                <Typography>
+                  Geography: {Array.isArray(segment.geography)
+                    ? segment.geography.join(', ')
+                    : segment.geography}
+                </Typography>
+                {segment.msfAmount && (
+                  <Typography>
+                    MSF Amount: {(() => {
+                      const { operator, value1, value2 } = segment.msfAmount;
+                      switch (operator) {
+                        case '>=':
+                          return `≥ $${value1}`;
+                        case '<=':
+                          return `≤ $${value1}`;
+                        case '=':
+                          return `= $${value1}`;
+                        case 'between':
+                          return `$${value1} - $${value2}`;
+                        default:
+                          return 'Not specified';
+                      }
+                    })()}
+                  </Typography>
+                )}
+                {segment.triggers && Array.isArray(segment.triggers) && segment.triggers.length > 0 && (
+                  <Typography>
+                    Triggers: {segment.triggers.map(t => {
+                      const trigger = triggers.find(trigger => trigger.id === t);
+                      return trigger ? `${trigger.triggerName} (${trigger.type})` : '';
+                    }).filter(Boolean).join(', ')}
+                  </Typography>
+                )}
+                {segment.existingSegments && Array.isArray(segment.existingSegments) && segment.existingSegments.length > 0 && (
+                  <Typography>
+                    Existing Segments: {segment.existingSegments.map(s => segments.find(seg => seg.id === s)?.segmentName).filter(Boolean).join(', ')}
+                  </Typography>
+                )}
               </Paper>
             </Grid>
           ))}

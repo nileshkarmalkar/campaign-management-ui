@@ -116,7 +116,7 @@ function App() {
           <CssBaseline />
           <HashRouter>
             <Layout>
-              <Box sx={{ position: 'fixed', top: 10, right: 10, zIndex: 1000 }}>
+              <Box sx={{ position: 'fixed', top: 80, right: 20, zIndex: 9999 }}>
                 <Button onClick={handleLoadSampleData} variant="contained" color="primary" sx={{ mr: 1 }}>
                   Load Sample Data
                 </Button>

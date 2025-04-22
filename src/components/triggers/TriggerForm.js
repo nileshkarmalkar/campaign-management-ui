@@ -76,9 +76,9 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.type}
               onChange={handleChange}
             >
-              <MenuItem value="event">Event Based</MenuItem>
-              <MenuItem value="schedule">Schedule Based</MenuItem>
-              <MenuItem value="condition">Condition Based</MenuItem>
+              <MenuItem value="event">Event</MenuItem>
+              <MenuItem value="schedule">Schedule</MenuItem>
+              <MenuItem value="condition">Condition</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -90,9 +90,9 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.status}
               onChange={handleChange}
             >
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
-              <MenuItem value="draft">Draft</MenuItem>
+              <MenuItem value="active">active</MenuItem>
+              <MenuItem value="inactive">inactive</MenuItem>
+              <MenuItem value="draft">draft</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -114,6 +114,8 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
                       setFormData({ ...formData, conditions: newConditions });
                     }}
                   >
+                    <MenuItem value="deviceAge">Device Age</MenuItem>
+                    <MenuItem value="dataUsage">Data Usage</MenuItem>
                     <MenuItem value="triggerName">Trigger Name</MenuItem>
                   </Select>
                 </FormControl>
@@ -131,9 +133,10 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
                     }}
                   >
                     <MenuItem value="=">=</MenuItem>
-                    <MenuItem value="contains">Contains</MenuItem>
-                    <MenuItem value="like">Like</MenuItem>
-                    <MenuItem value="not in">Not In</MenuItem>
+                    <MenuItem value=">">{">"}</MenuItem>
+                    <MenuItem value="<">{"<"}</MenuItem>
+                    <MenuItem value=">=">{">="}</MenuItem>
+                    <MenuItem value="<=">{"<="}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

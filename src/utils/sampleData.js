@@ -5,7 +5,7 @@ export const sampleCampaigns = [
     campaignCode: 'SUP25',
     subCampCode: 'SUP25-001',
     businessUnit: ['Mobility - TELUS'],
-    campaignType: 'Upgrade',
+    campaignType: 'Upsell',
     deploymentDate: '2025-06-01',
     deploymentEndDate: '2025-08-31',
     status: 'Draft',
@@ -18,7 +18,7 @@ export const sampleCampaigns = [
     prepaidPostpaid: ['Postpaid'],
     byod: false,
     mtm: false,
-    contractExpiryDuration: 24,
+    contractExpiryDuration: '6',
     renewalWindow: {
       operator: '>',
       value: 90
@@ -47,7 +47,7 @@ export const sampleCampaigns = [
     prepaidPostpaid: ['Postpaid'],
     byod: true,
     mtm: true,
-    contractExpiryDuration: 12,
+    contractExpiryDuration: '3',
     renewalWindow: {
       operator: '>',
       value: 60

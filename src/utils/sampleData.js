@@ -1,60 +1,66 @@
 export const sampleCampaigns = [
   {
     id: 'camp_001',
-    campaignName: 'Summer 2025 Upgrade Promotion',
-    campaignCode: 'SUP25',
-    subCampCode: 'SUP25-001',
-    businessUnit: ['Mobility - TELUS'],
-    campaignType: 'Upsell',
-    deploymentDate: '2025-06-01',
-    deploymentEndDate: '2025-08-31',
-    status: 'Draft',
     requestorName: 'John Smith',
-    marcommPrime: 'MCP-2025-001',
-    description: 'Summer promotion targeting existing customers for device upgrades',
+    deploymentDate: '2025-05-25T04:00:00.000Z',
+    deploymentEndDate: '2025-08-30T04:00:00.000Z',
+    campaignName: 'Summer 2025 Upgrade Promotion',
+    targetBases: 2,
+    segmentsPerBase: '7-20',
+    businessUnit: ['Mobility - TELUS'],
+    campaignType: 'Loyalty',
+    campaignCode: 'RNW',
+    subCampCode: 'TRTRIG',
+    medium: ['SMS'],
+    marcommPrime: 'John Smith',
     brand: ['TELUS'],
     lineOfBusiness: ['Mobility'],
-    language: ['English', 'French'],
-    prepaidPostpaid: ['Postpaid'],
-    byod: false,
-    mtm: false,
+    contractStrategyWaiver: false,
+    contractStrategyWaiverReason: '',
     contractExpiryDuration: '6',
+    language: ['English'],
+    prepaidPostpaid: ['Postpaid'],
+    byod: true,
+    mtm: true,
     renewalWindow: {
-      operator: '>',
-      value: 90
+      operator: '>=',
+      value: '90'
     },
     contactStrategyRule: {
-      operator: '<',
-      value: 30
+      operator: '<=',
+      value: '60'
     }
   },
   {
     id: 'camp_002',
+    requestorName: 'Sarah Johnson',
+    deploymentDate: '2025-07-01T04:00:00.000Z',
+    deploymentEndDate: '2025-09-30T04:00:00.000Z',
     campaignName: 'Home Internet Bundle Offer',
-    campaignCode: 'HBO25',
-    subCampCode: 'HBO25-001',
+    targetBases: 1,
+    segmentsPerBase: '1-6',
     businessUnit: ['FFH - Home Solutions'],
     campaignType: 'Cross-sell',
-    deploymentDate: '2025-07-01',
-    deploymentEndDate: '2025-09-30',
-    status: 'Draft',
-    requestorName: 'Sarah Johnson',
-    marcommPrime: 'MCP-2025-002',
-    description: 'Bundle offer for existing mobility customers',
+    campaignCode: 'HBO25',
+    subCampCode: 'HBO25-001',
+    medium: ['DM', 'EM'],
+    marcommPrime: 'Sarah Johnson',
     brand: ['TELUS'],
     lineOfBusiness: ['Home Solutions'],
+    contractStrategyWaiver: false,
+    contractStrategyWaiverReason: '',
+    contractExpiryDuration: '3',
     language: ['English', 'French'],
     prepaidPostpaid: ['Postpaid'],
     byod: true,
     mtm: true,
-    contractExpiryDuration: '3',
     renewalWindow: {
-      operator: '>',
-      value: 60
+      operator: '>=',
+      value: '60'
     },
     contactStrategyRule: {
-      operator: '<',
-      value: 45
+      operator: '<=',
+      value: '45'
     }
   }
 ];

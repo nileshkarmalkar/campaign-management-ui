@@ -105,12 +105,11 @@ export const sampleTriggers = [
     id: 'trig_001',
     triggerName: 'Device Age Trigger',
     type: 'Time-based',
-    condition: {
+    conditions: [{
       field: 'deviceAge',
       operator: '>',
-      value: '18',
-      unit: 'months'
-    },
+      value: '18'
+    }],
     frequency: 'One-time',
     segmentId: 'seg_001',
     campaignId: 'camp_001',
@@ -121,14 +120,11 @@ export const sampleTriggers = [
     id: 'trig_002',
     triggerName: 'Usage Pattern Trigger',
     type: 'Event-based',
-    condition: {
+    conditions: [{
       field: 'dataUsage',
       operator: '>',
-      value: '80',
-      unit: 'percent',
-      duration: '3',
-      durationUnit: 'months'
-    },
+      value: '80'
+    }],
     frequency: 'Monthly',
     segmentId: 'seg_002',
     campaignId: 'camp_002',

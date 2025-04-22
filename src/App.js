@@ -1,10 +1,11 @@
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, Button, Box } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { AppProvider } from './context/AppContext';
+import { loadSampleData, clearAllData } from './utils/sampleData';
 import Layout from './components/layout/Layout';
 import Campaigns from './components/campaigns/Campaigns';
 import Segments from './components/segments/Segments';
@@ -98,14 +99,32 @@ const theme = createTheme({
 });
 
 function App() {
+  const handleLoadSampleData = () => {
+    loadSampleData();
+    window.location.reload();
+  };
+
+  const handleClearAllData = () => {
+    clearAllData();
+    window.location.reload();
+  };
+
   return (
     <AppProvider>
       <LocalizationProvider dateAdapter={AdapterDayjs} dateLibInstance={dayjs}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <HashRouter>
-        <Layout>
-          <Routes>
+            <Layout>
+              <Box sx={{ position: 'fixed', top: 10, right: 10, zIndex: 1000 }}>
+                <Button onClick={handleLoadSampleData} variant="contained" color="primary" sx={{ mr: 1 }}>
+                  Load Sample Data
+                </Button>
+                <Button onClick={handleClearAllData} variant="contained" color="secondary">
+                  Clear All Data
+                </Button>
+              </Box>
+              <Routes>
           <Route path="/campaigns" element={<Campaigns />} />
           <Route path="/segments" element={<Segments />} />
           <Route path="/communications" element={<Communications />} />

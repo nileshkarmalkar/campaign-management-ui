@@ -101,6 +101,29 @@ A React-based web application for managing marketing campaigns, segments, trigge
    npm run deploy
    ```
 
+## Using Sample Data
+
+To help you get started and test the functionality of the application, we've included a sample dataset. You can easily load this data into the application using the following steps:
+
+1. Start the application and navigate to any page.
+2. Look for the "Load Sample Data" button in the top-right corner of the screen.
+3. Click the button to populate the application with sample campaigns, segments, triggers, communications, and offer mappings.
+
+This sample data includes:
+- Two sample campaigns
+- Two sample customer segments
+- Two sample triggers
+- Two sample communications
+- Two sample offer mappings
+
+You can use this data to explore the various features of the application, including the campaign workflow, segment creation, trigger setup, and offer mapping.
+
+To clear all data and start fresh:
+1. Click the "Clear All Data" button in the top-right corner of the screen.
+2. This will remove all data from the application, including any sample data or data you've entered manually.
+
+Note: The sample data is stored in your browser's local storage. It will persist across page refreshes but will be cleared if you clear your browser data.
+
 ## Dependencies
 
 - React

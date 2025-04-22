@@ -6,8 +6,8 @@ import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
 
 const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
-  const [formData, setFormData] = useState(
-    initialData || {
+  const [formData, setFormData] = useState(() => {
+    const defaultData = {
       triggerName: '',
       description: '',
       type: '',
@@ -17,8 +17,20 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
         operator: '=',
         value: ''
       }]
+    };
+
+    if (initialData) {
+      return {
+        ...defaultData,
+        ...initialData,
+        conditions: initialData.conditions && initialData.conditions.length > 0
+          ? initialData.conditions
+          : defaultData.conditions
+      };
     }
-  );
+
+    return defaultData;
+  });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -73,7 +85,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
             <InputLabel>Trigger Type</InputLabel>
             <Select
               name="type"
-              value={formData.type}
+              value={formData.type || ''}
               onChange={handleChange}
             >
               <MenuItem value="event">Event</MenuItem>
@@ -87,7 +99,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
             <InputLabel>Status</InputLabel>
             <Select
               name="status"
-              value={formData.status}
+              value={formData.status || 'active'}
               onChange={handleChange}
             >
               <MenuItem value="active">active</MenuItem>
@@ -107,7 +119,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
                   <InputLabel>Field</InputLabel>
                   <Select
                     name={`conditions.${index}.field`}
-                    value={condition.field}
+                    value={condition.field || ''}
                     onChange={(e) => {
                       const newConditions = [...formData.conditions];
                       newConditions[index].field = e.target.value;
@@ -125,7 +137,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
                   <InputLabel>Operator</InputLabel>
                   <Select
                     name={`conditions.${index}.operator`}
-                    value={condition.operator}
+                    value={condition.operator || '='}
                     onChange={(e) => {
                       const newConditions = [...formData.conditions];
                       newConditions[index].operator = e.target.value;

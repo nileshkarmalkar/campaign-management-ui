@@ -100,7 +100,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
           <Typography variant="h6">Trigger Conditions</Typography>
           <Divider style={{ marginBottom: '20px' }} />
         </Grid>
-          {formData.conditions.map((condition, index) => (
+          {formData.conditions && formData.conditions.map((condition, index) => (
             <React.Fragment key={index}>
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth>

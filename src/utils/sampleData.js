@@ -104,31 +104,31 @@ export const sampleTriggers = [
   {
     id: 'trig_001',
     triggerName: 'Device Age Trigger',
-    type: 'Time-based',
+    type: 'event',
     conditions: [{
-      field: 'deviceAge',
-      operator: '>',
+      field: 'triggerName',
+      operator: '=',
       value: '18'
     }],
     frequency: 'One-time',
     segmentId: 'seg_001',
     campaignId: 'camp_001',
-    status: 'Active',
+    status: 'active',
     description: 'Triggers when device age exceeds 18 months'
   },
   {
     id: 'trig_002',
     triggerName: 'Usage Pattern Trigger',
-    type: 'Event-based',
+    type: 'event',
     conditions: [{
-      field: 'dataUsage',
+      field: 'triggerName',
       operator: '>',
       value: '80'
     }],
     frequency: 'Monthly',
     segmentId: 'seg_002',
     campaignId: 'camp_002',
-    status: 'Active',
+    status: 'active',
     description: 'Triggers when data usage exceeds 80% for 3 consecutive months'
   }
 ];

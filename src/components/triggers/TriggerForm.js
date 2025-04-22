@@ -10,7 +10,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
     const defaultData = {
       triggerName: '',
       description: '',
-      type: '',
+      type: 'event',
       status: 'active',
       conditions: [{
         field: 'triggerName',
@@ -88,9 +88,9 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.type || ''}
               onChange={handleChange}
             >
-              <MenuItem value="event">Event</MenuItem>
-              <MenuItem value="schedule">Schedule</MenuItem>
-              <MenuItem value="condition">Condition</MenuItem>
+              <MenuItem value="event">event</MenuItem>
+              <MenuItem value="schedule">schedule</MenuItem>
+              <MenuItem value="condition">condition</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -126,9 +126,9 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
                       setFormData({ ...formData, conditions: newConditions });
                     }}
                   >
-                    <MenuItem value="deviceAge">Device Age</MenuItem>
-                    <MenuItem value="dataUsage">Data Usage</MenuItem>
-                    <MenuItem value="triggerName">Trigger Name</MenuItem>
+                    <MenuItem value="deviceAge">deviceAge</MenuItem>
+                    <MenuItem value="dataUsage">dataUsage</MenuItem>
+                    <MenuItem value="triggerName">triggerName</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

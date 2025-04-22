@@ -72,8 +72,9 @@ const Triggers = () => {
             label="Search By"
           >
             <MenuItem value="triggerName">Trigger Name</MenuItem>
-            <MenuItem value="type">Trigger Type</MenuItem>
+            <MenuItem value="type">Type</MenuItem>
             <MenuItem value="status">Status</MenuItem>
+            <MenuItem value="description">Description</MenuItem>
           </Select>
         </FormControl>
         <TextField

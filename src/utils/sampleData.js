@@ -106,8 +106,8 @@ export const sampleTriggers = [
     triggerName: 'Device Age Trigger',
     type: 'event',
     conditions: [{
-      field: 'triggerName',
-      operator: '=',
+      field: 'deviceAge',
+      operator: '>',
       value: '18'
     }],
     frequency: 'One-time',
@@ -121,7 +121,7 @@ export const sampleTriggers = [
     triggerName: 'Usage Pattern Trigger',
     type: 'event',
     conditions: [{
-      field: 'triggerName',
+      field: 'dataUsage',
       operator: '>',
       value: '80'
     }],

@@ -117,11 +117,8 @@ function App() {
           <HashRouter>
             <Layout>
               <Box sx={{ position: 'fixed', top: 80, right: 20, zIndex: 9999 }}>
-                <Button onClick={handleLoadSampleData} variant="contained" color="primary" sx={{ mr: 1 }}>
+                <Button onClick={handleLoadSampleData} variant="contained" color="primary">
                   Load Sample Data
-                </Button>
-                <Button onClick={handleClearAllData} variant="contained" color="secondary">
-                  Clear All Data
                 </Button>
               </Box>
               <Routes>

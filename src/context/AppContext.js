@@ -24,7 +24,7 @@ export const AppProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState(() => loadFromLocalStorage('campaigns', []));
   const [triggers, setTriggers] = useState(() => loadFromLocalStorage('triggers', []));
   const [segments, setSegments] = useState(() => loadFromLocalStorage('segments', []));
-  const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('segmentOfferMappings', []));
+  const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('offerMappings', []));
 
   useEffect(() => {
     saveToLocalStorage('campaigns', campaigns);
@@ -39,7 +39,7 @@ export const AppProvider = ({ children }) => {
   }, [segments]);
 
   useEffect(() => {
-    saveToLocalStorage('segmentOfferMappings', segmentOfferMappings);
+    saveToLocalStorage('offerMappings', segmentOfferMappings);
   }, [segmentOfferMappings]);
 
   const addCampaign = (campaign) => {

@@ -91,7 +91,10 @@ export const AppProvider = ({ children }) => {
     setTriggers([]);
     setSegments([]);
     setSegmentOfferMappings([]);
-    localStorage.clear();
+    localStorage.removeItem('campaigns');
+    localStorage.removeItem('triggers');
+    localStorage.removeItem('segments');
+    localStorage.removeItem('offerMappings');
   };
 
   return (

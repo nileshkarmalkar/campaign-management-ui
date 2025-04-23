@@ -115,7 +115,7 @@ const AppContent = () => {
     setCampaigns(loadFromLocalStorage('campaigns', []));
     setTriggers(loadFromLocalStorage('triggers', []));
     setSegments(loadFromLocalStorage('segments', []));
-    setSegmentOfferMappings(loadFromLocalStorage('segmentOfferMappings', []));
+    setSegmentOfferMappings(loadFromLocalStorage('offerMappings', []));
   };
 
   const { logout } = useAuth();

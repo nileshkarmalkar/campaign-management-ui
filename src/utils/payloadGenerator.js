@@ -4,7 +4,7 @@ const formatDate = (date) => {
   return new Date(date).toISOString();
 };
 
-export const generatePayload = (type, data) => {
+export const generatePayload = (type, data, user) => {
   // Create a copy of data to avoid modifying the original
   const processedData = { ...data };
 
@@ -26,6 +26,10 @@ export const generatePayload = (type, data) => {
     type,
     timestamp: new Date().toISOString(),
     action: data.id ? 'update' : 'create',
+    user: {
+      email: user.email,
+      role: user.role
+    }
   };
 
   switch (type) {

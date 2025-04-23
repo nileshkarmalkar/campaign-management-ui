@@ -6,7 +6,7 @@ import PayloadViewer from '../PayloadViewer';
 import { useAuth } from '../../context/AuthContext';
 
 const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
-  const { checkPermission } = useAuth();
+  const { checkPermission, user } = useAuth();
   const canWrite = checkPermission('write');
   const [formData, setFormData] = useState(
     initialData || {
@@ -88,7 +88,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (validateDates(formData) && canWrite) {
-      const payload = generatePayload('campaign', formData);
+      const payload = generatePayload('campaign', formData, user);
       logPayload(payload);
       setGeneratedPayload(payload);
       onSubmit(formData);

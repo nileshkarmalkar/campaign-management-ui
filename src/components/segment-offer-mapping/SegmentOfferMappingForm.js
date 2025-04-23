@@ -12,11 +12,13 @@ import {
 } from '@mui/material';
 import CustomDatePicker from '../common/CustomDatePicker';
 import { useAppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
 
 const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   const { segments } = useAppContext();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     segmentId: '',
     segmentName: '',
@@ -52,7 +54,7 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
       status: 'Created',
       endDate: null
     };
-    const payload = generatePayload('offer', submitData);
+    const payload = generatePayload('offer', submitData, user);
     logPayload(payload);
     setGeneratedPayload(payload);
     onSubmit(submitData);

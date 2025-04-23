@@ -4,8 +4,10 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
+import { useAuth } from '../../context/AuthContext';
 
 const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState(() => {
     const defaultData = {
       triggerName: '',
@@ -41,7 +43,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const payload = generatePayload('trigger', formData);
+    const payload = generatePayload('trigger', formData, user);
     logPayload(payload);
     setGeneratedPayload(payload);
     onSubmit(formData);

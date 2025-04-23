@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment, Typography, Box } from '@mui/material';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
+import { useAuth } from '../../context/AuthContext';
 
 const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState(
     initialData || {
       segmentName: '',
@@ -43,7 +45,7 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const payload = generatePayload('segment', formData);
+    const payload = generatePayload('segment', formData, user);
     logPayload(payload);
     setGeneratedPayload(payload);
     onSubmit(formData);

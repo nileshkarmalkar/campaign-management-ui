@@ -26,9 +26,12 @@ export const generatePayload = (type, data, user) => {
     type,
     timestamp: new Date().toISOString(),
     action: data.id ? 'update' : 'create',
-    user: {
-      email: user.email,
-      role: user.role
+    user: user ? {
+      email: user.email || 'unknown',
+      role: user.role || 'unknown'
+    } : {
+      email: 'unknown',
+      role: 'unknown'
     }
   };
 

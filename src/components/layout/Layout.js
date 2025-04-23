@@ -20,16 +20,17 @@ import {
 import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 const drawerWidth = 240;
 
 const menuItems = [
-  { text: 'Workflow', icon: <WorkOutline />, path: '/workflow' },
-  { text: 'Campaigns', icon: <Campaign />, path: '/campaigns' },
-  { text: 'Triggers', icon: <NotificationsActive />, path: '/triggers' },
-  { text: 'Segments', icon: <Segment />, path: '/segments' },
-  { text: 'Offers', icon: <LocalOffer />, path: '/segment-offer-mapping' },
-  { text: 'Communications', icon: <Message />, path: '/communications' },
+  { text: 'Workflow', icon: <WorkOutline />, path: '/workflow', requiredPermission: 'read' },
+  { text: 'Campaigns', icon: <Campaign />, path: '/campaigns', requiredPermission: 'write' },
+  { text: 'Triggers', icon: <NotificationsActive />, path: '/triggers', requiredPermission: 'write' },
+  { text: 'Segments', icon: <Segment />, path: '/segments', requiredPermission: 'write' },
+  { text: 'Offers', icon: <LocalOffer />, path: '/segment-offer-mapping', requiredPermission: 'write' },
+  { text: 'Communications', icon: <Message />, path: '/communications', requiredPermission: 'write' },
 ];
 
 const TelusLogo = (props) => (
@@ -40,6 +41,7 @@ const TelusLogo = (props) => (
 
 const Layout = ({ children }) => {
   const { clearAllData } = useAppContext();
+  const { currentUser, checkPermission } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleClearData = () => {
@@ -63,15 +65,20 @@ const Layout = ({ children }) => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: '#4B286D' }}>
             Campaign Management
           </Typography>
-          <Button
-            color="secondary"
-            startIcon={<DeleteOutline />}
-            onClick={handleClearData}
-            variant="contained"
-            sx={{ ml: 2 }}
-          >
-            Clear All Data
-          </Button>
+          <Typography variant="subtitle1" sx={{ color: '#4B286D', mr: 2 }}>
+            {currentUser?.name} ({currentUser?.role})
+          </Typography>
+          {checkPermission('modify') && (
+            <Button
+              color="secondary"
+              startIcon={<DeleteOutline />}
+              onClick={handleClearData}
+              variant="contained"
+              sx={{ ml: 2 }}
+            >
+              Clear All Data
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -90,10 +97,12 @@ const Layout = ({ children }) => {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {menuItems.map((item) => (
-              <ListItem button key={item.text} component={RouterLink} to={item.path}>
-                <ListItemIcon sx={{ color: '#4B286D' }}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} sx={{ color: '#2A2C2E' }} />
-              </ListItem>
+              checkPermission(item.requiredPermission) && (
+                <ListItem button key={item.text} component={RouterLink} to={item.path}>
+                  <ListItemIcon sx={{ color: '#4B286D' }}>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} sx={{ color: '#2A2C2E' }} />
+                </ListItem>
+              )
             ))}
           </List>
         </Box>

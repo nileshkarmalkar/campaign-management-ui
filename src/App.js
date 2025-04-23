@@ -4,9 +4,12 @@ import { ThemeProvider, createTheme, CssBaseline, Button, Box } from '@mui/mater
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { AppProvider } from './context/AppContext';
+import { AppProvider, useAppContext, loadFromLocalStorage } from './context/AppContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { loadSampleData } from './utils/sampleData';
 import Layout from './components/layout/Layout';
+import Login from './components/auth/Login';
+import ProtectedRoutes from './components/auth/ProtectedRoutes';
 import Campaigns from './components/campaigns/Campaigns';
 import Segments from './components/segments/Segments';
 import Communications from './components/communications/Communications';
@@ -98,38 +101,85 @@ const theme = createTheme({
   }
 });
 
-function App() {
+const AppContent = () => {
+  const { 
+    setCampaigns, 
+    setTriggers, 
+    setSegments, 
+    setSegmentOfferMappings 
+  } = useAppContext();
+  
   const handleLoadSampleData = () => {
-    loadSampleData();
-    window.location.reload();
+    loadSampleData(); // This will save to localStorage
+    // Force a reload of the data from localStorage
+    setCampaigns(loadFromLocalStorage('campaigns', []));
+    setTriggers(loadFromLocalStorage('triggers', []));
+    setSegments(loadFromLocalStorage('segments', []));
+    setSegmentOfferMappings(loadFromLocalStorage('segmentOfferMappings', []));
+  };
+
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
-    <AppProvider>
-      <LocalizationProvider dateAdapter={AdapterDayjs} dateLibInstance={dayjs}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <HashRouter>
-            <Layout>
-              <Box sx={{ position: 'fixed', top: 80, right: 20, zIndex: 9999 }}>
-                <Button onClick={handleLoadSampleData} variant="contained" color="primary">
-                  Load Sample Data
-                </Button>
-              </Box>
-              <Routes>
-          <Route path="/campaigns" element={<Campaigns />} />
-          <Route path="/segments" element={<Segments />} />
-          <Route path="/communications" element={<Communications />} />
-          <Route path="/triggers" element={<Triggers />} />
-          <Route path="/segment-offer-mapping" element={<SegmentOfferMapping />} />
-          <Route path="/workflow" element={<CampaignWorkflow />} />
-          <Route path="/" element={<Navigate to="/workflow" replace />} />
+    <LocalizationProvider dateAdapter={AdapterDayjs} dateLibInstance={dayjs}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <HashRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoutes>
+                  <Layout>
+                    <Box sx={{ position: 'fixed', top: 80, right: 20, zIndex: 9999 }}>
+                      <Button 
+                        onClick={handleLoadSampleData} 
+                        variant="contained" 
+                        color="primary"
+                        sx={{ mr: 2 }}
+                      >
+                        Load Sample Data
+                      </Button>
+                      <Button 
+                        onClick={handleLogout} 
+                        variant="outlined" 
+                        color="primary"
+                      >
+                        Logout
+                      </Button>
+                    </Box>
+                    <Routes>
+                      <Route path="/campaigns" element={<Campaigns />} />
+                      <Route path="/segments" element={<Segments />} />
+                      <Route path="/communications" element={<Communications />} />
+                      <Route path="/triggers" element={<Triggers />} />
+                      <Route path="/segment-offer-mapping" element={<SegmentOfferMapping />} />
+                      <Route path="/workflow" element={<CampaignWorkflow />} />
+                      <Route path="/" element={<Navigate to="/workflow" replace />} />
+                    </Routes>
+                  </Layout>
+                </ProtectedRoutes>
+              }
+            />
           </Routes>
-        </Layout>
-          </HashRouter>
-        </ThemeProvider>
-      </LocalizationProvider>
-    </AppProvider>
+        </HashRouter>
+      </ThemeProvider>
+    </LocalizationProvider>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </AuthProvider>
   );
 }
 

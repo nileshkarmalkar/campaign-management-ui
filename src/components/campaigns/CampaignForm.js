@@ -3,8 +3,11 @@ import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select, Out
 import CustomDatePicker from '../common/CustomDatePicker';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
+import { useAuth } from '../../context/AuthContext';
 
 const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
+  const { checkPermission } = useAuth();
+  const canWrite = checkPermission('write');
   const [formData, setFormData] = useState(
     initialData || {
       requestorName: '',
@@ -84,7 +87,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (validateDates(formData)) {
+    if (validateDates(formData) && canWrite) {
       const payload = generatePayload('campaign', formData);
       logPayload(payload);
       setGeneratedPayload(payload);
@@ -109,6 +112,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.campaignName}
               onChange={handleChange}
               required
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12}>
@@ -119,6 +123,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.requestorName}
               onChange={handleChange}
               required
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -127,6 +132,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.deploymentDate}
               onChange={handleDateChange('deploymentDate')}
               required
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -138,6 +144,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               error={!!dateErrors.deploymentEndDate}
               helperText={dateErrors.deploymentEndDate}
               minDate={formData.deploymentDate || null}
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -148,6 +155,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 value={formData.targetBases}
                 onChange={handleChange}
                 required
+                disabled={!canWrite}
               >
                 {[...Array(10)].map((_, i) => (
                   <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>
@@ -163,6 +171,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 value={formData.segmentsPerBase}
                 onChange={handleChange}
                 required
+                disabled={!canWrite}
               >
                 <MenuItem value="1-6">1 to 6</MenuItem>
                 <MenuItem value="7-20">7 to 20</MenuItem>
@@ -180,6 +189,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 input={<OutlinedInput label="Business Unit" />}
                 renderValue={(selected) => selected.join(', ')}
                 required
+                disabled={!canWrite}
               >
                 {['FFH - Home Solutions', 'Mobility - TELUS', 'Koodo', 'EPP', 'PublicMobile', 'Others - Masterbrand, Health etc'].map((unit) => (
                   <MenuItem key={unit} value={unit}>
@@ -198,6 +208,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 value={formData.campaignType}
                 onChange={handleChange}
                 required
+                disabled={!canWrite}
               >
                 <MenuItem value="M&H">M&H</MenuItem>
                 <MenuItem value="Cross-Sell">Cross-Sell</MenuItem>
@@ -217,6 +228,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.campaignCode}
               onChange={handleChange}
               required
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -226,6 +238,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               name="subCampCode"
               value={formData.subCampCode}
               onChange={handleChange}
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -237,6 +250,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 onChange={handleChange}
                 required
                 multiple
+                disabled={!canWrite}
               >
                 <MenuItem value="EM">EM</MenuItem>
                 <MenuItem value="DM">DM</MenuItem>
@@ -256,6 +270,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               value={formData.marcommPrime}
               onChange={handleChange}
               required
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12}>
@@ -272,6 +287,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 onChange={handleChange}
                 input={<OutlinedInput label="Brand" />}
                 renderValue={(selected) => selected.join(', ')}
+                disabled={!canWrite}
               >
                 {['TELUS', 'Koodo'].map((brand) => (
                   <MenuItem key={brand} value={brand}>
@@ -292,6 +308,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 onChange={handleChange}
                 input={<OutlinedInput label="Line of Business" />}
                 renderValue={(selected) => selected.join(', ')}
+                disabled={!canWrite}
               >
                 {['Mobility', 'Home Solution', 'Subscription on Demand'].map((lob) => (
                   <MenuItem key={lob} value={lob}>
@@ -309,6 +326,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 name="contractExpiryDuration"
                 value={formData.contractExpiryDuration}
                 onChange={handleChange}
+                disabled={!canWrite}
               >
                 <MenuItem value="1">1 month</MenuItem>
                 <MenuItem value="3">3 months</MenuItem>
@@ -326,6 +344,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 onChange={handleChange}
                 input={<OutlinedInput label="Language" />}
                 renderValue={(selected) => selected.join(', ')}
+                disabled={!canWrite}
               >
                 {['English', 'French'].map((lang) => (
                   <MenuItem key={lang} value={lang}>
@@ -346,6 +365,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 onChange={handleChange}
                 input={<OutlinedInput label="Prepaid/Postpaid" />}
                 renderValue={(selected) => selected.join(', ')}
+                disabled={!canWrite}
               >
                 {['Prepaid', 'Postpaid'].map((option) => (
                   <MenuItem key={option} value={option}>
@@ -368,6 +388,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                     }
                   })}
                   name="byod"
+                  disabled={!canWrite}
                 />
               }
               label="BYOD"
@@ -383,6 +404,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                     }
                   })}
                   name="mtm"
+                  disabled={!canWrite}
                 />
               }
               label="MTM"
@@ -399,6 +421,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 name="renewalWindow.operator"
                 value={formData.renewalWindow.operator}
                 onChange={handleChange}
+                disabled={!canWrite}
               >
                 <MenuItem value="=">=</MenuItem>
                 <MenuItem value="<=">≤</MenuItem>
@@ -415,6 +438,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               type="number"
               value={formData.renewalWindow.value}
               onChange={handleChange}
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -424,6 +448,7 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
                 name="contactStrategyRule.operator"
                 value={formData.contactStrategyRule.operator}
                 onChange={handleChange}
+                disabled={!canWrite}
               >
                 <MenuItem value="=">=</MenuItem>
                 <MenuItem value="<=">≤</MenuItem>
@@ -440,10 +465,16 @@ const CampaignForm = ({ onSubmit, onCancel, initialData = null }) => {
               type="number"
               value={formData.contactStrategyRule.value}
               onChange={handleChange}
+              disabled={!canWrite}
             />
           </Grid>
           <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary">
+            <Button 
+              type="submit" 
+              variant="contained" 
+              color="primary" 
+              disabled={!canWrite}
+            >
               {initialData ? 'Update' : 'Submit'}
             </Button>
             <Button onClick={onCancel} variant="outlined" style={{ marginLeft: '10px' }}>

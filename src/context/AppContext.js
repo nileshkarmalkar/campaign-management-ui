@@ -109,7 +109,12 @@ export const AppProvider = ({ children }) => {
       segmentOfferMappings,
       addSegmentOfferMapping,
       updateSegmentOfferMapping,
-      clearAllData
+      clearAllData,
+      // Add setter functions
+      setCampaigns,
+      setTriggers,
+      setSegments,
+      setSegmentOfferMappings
     }}>
       {children}
     </AppContext.Provider>
@@ -117,3 +122,5 @@ export const AppProvider = ({ children }) => {
 };
 
 export const useAppContext = () => useContext(AppContext);
+
+export { loadFromLocalStorage };

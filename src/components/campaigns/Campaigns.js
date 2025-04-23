@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton, Chip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
@@ -9,10 +10,13 @@ import { format } from 'date-fns';
 const Campaigns = () => {
   const [showForm, setShowForm] = useState(false);
   const { campaigns, addCampaign, updateCampaign } = useAppContext();
+  const { checkPermission } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('campaignName');
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+
+  const canWrite = checkPermission('write');
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(campaign => {
@@ -93,7 +97,7 @@ const Campaigns = () => {
           }}
         />
       </Box>
-      {!showForm && (
+      {!showForm && canWrite && (
         <Button
           variant="contained"
           color="primary"
@@ -118,9 +122,11 @@ const Campaigns = () => {
               <Paper style={{ padding: '20px' }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Typography variant="h6">{campaign.campaignName}</Typography>
-                  <IconButton onClick={() => handleEditCampaign(campaign)} color="primary">
-                    <EditIcon />
-                  </IconButton>
+                  {canWrite && (
+                    <IconButton onClick={() => handleEditCampaign(campaign)} color="primary">
+                      <EditIcon />
+                    </IconButton>
+                  )}
                 </Box>
                 <Typography variant="subtitle1" style={{marginTop: '10px', fontWeight: 'bold'}}>Campaign Metadata</Typography>
                 <Typography>Requestor: {campaign.requestorName}</Typography>

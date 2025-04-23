@@ -4,7 +4,16 @@ A React-based web application for managing marketing campaigns, segments, trigge
 
 ## Features
 
-### 1. Campaign Management
+### 1. Authentication and Authorization
+- User authentication using TELUS SSO (Single Sign-On)
+- Role-based access control with three user roles:
+  - Read-only (Viewer)
+  - Read-write (User)
+  - Read-write-modify (Admin)
+- Protected routes and components based on user permissions
+- Secure API access with role-based restrictions
+
+### 2. Campaign Management
 - Create and manage marketing campaigns
 - Set deployment dates and end dates
 - Define campaign metadata:
@@ -47,15 +56,16 @@ A React-based web application for managing marketing campaigns, segments, trigge
 - Export payload data for external systems
 - Track payload version history
 
-### 7. Campaign Workflow
+### 8. Campaign Workflow
 - Guided workflow for campaign creation
 - Step-by-step process:
   1. Create Campaign
   2. Define Segment
   3. Configure Triggers
   4. Map Offers
+- Access control based on user roles and permissions
 
-### 8. Data Persistence
+### 9. Data Persistence
 - All data is automatically saved to browser's localStorage
 - Data persists across page refreshes and browser sessions
 - Clear All Data functionality for testing and reset
@@ -72,6 +82,8 @@ A React-based web application for managing marketing campaigns, segments, trigge
 - Form validation and error handling
 - Search and filter capabilities
 - Card-based UI for better data visualization
+- Authentication and authorization using custom hooks and context
+- Protected routes using React Router
 
 ## Getting Started
 
@@ -86,20 +98,40 @@ A React-based web application for managing marketing campaigns, segments, trigge
    npm install
    ```
 
-3. Start the development server:
+3. Configure environment variables:
+   Create a `.env` file in the root directory and add the following:
+   ```
+   REACT_APP_TELUS_SSO_URL=https://your-telus-sso-url.com
+   ```
+
+4. Start the development server:
    ```bash
    npm start
    ```
 
-4. Build for production:
+5. Build for production:
    ```bash
    npm run build
    ```
 
-5. Deploy to GitHub Pages:
+6. Deploy to GitHub Pages:
    ```bash
    npm run deploy
    ```
+
+## Authentication
+
+To use the application, you need to log in using your TELUS email address. The application uses a simple email-based authentication system with predefined user accounts:
+
+- admin@telus.com (Admin role)
+- user@telus.com (User role)
+- viewer@telus.com (Viewer role)
+
+### User Roles
+
+1. **Viewer (Read-only)**: Can view all data but cannot make any changes.
+2. **User (Read-write)**: Can view data and make changes to campaigns, segments, triggers, and offer mappings.
+3. **Admin (Read-write-modify)**: Has full access to all features, including user management and system settings.
 
 ## Using Sample Data
 
@@ -110,11 +142,15 @@ To help you get started and test the functionality of the application, we've inc
 3. Click the button to populate the application with sample campaigns, segments, triggers, communications, and offer mappings.
 
 This sample data includes:
-- Two sample campaigns
-- Two sample customer segments
-- Two sample triggers
-- Two sample communications
-- Two sample offer mappings
+- Two sample campaigns (Summer 2025 Upgrade Promotion and Home Internet Bundle Offer)
+- Two sample customer segments (High-Value Mobility Customers and Internet-Only Customers)
+- Two sample triggers:
+  * VULNERABLE_TRIGGER_EVENTS (monitoring device checkup, rate plans, and service terms)
+  * ULTRA_HOT_TRIGGER (monitoring account unlinking, service cancellation events)
+- Two sample communications (Summer Upgrade Email and Bundle Offer Direct Mail)
+- Two sample offer mappings:
+  * TC-BRP-Q12025-ROC-TIER1 for High-Value Mobility Customers
+  * TC-BRP-Q13788-BC-TIER1 for Internet-Only Customers
 
 You can use this data to explore the various features of the application, including the campaign workflow, segment creation, trigger setup, and offer mapping.
 
@@ -132,6 +168,8 @@ Note: The sample data is stored in your browser's local storage. It will persist
 - date-fns
 - react-router-dom
 - gh-pages (for deployment)
+- react-query (for API calls and caching)
+- axios (for HTTP requests)
 
 ## Project Structure
 
@@ -139,6 +177,7 @@ Note: The sample data is stored in your browser's local storage. It will persist
 src/
 ├── assets/
 ├── components/
+│   ├── auth/
 │   ├── campaigns/
 │   ├── communications/
 │   ├── common/
@@ -149,10 +188,14 @@ src/
 │   ├── triggers/
 │   └── workflow/
 ├── context/
-│   └── AppContext.js
+│   ├── AppContext.js
+│   └── AuthContext.js
+├── hooks/
+│   └── useAuth.js
 ├── utils/
 │   ├── dayjsSetup.js
-│   └── payloadGenerator.js
+│   ├── payloadGenerator.js
+│   └── api.js
 ├── App.js
 └── index.js
 ```

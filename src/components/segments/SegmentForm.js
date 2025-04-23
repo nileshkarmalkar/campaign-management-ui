@@ -1,313 +1,158 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment, Typography, Box } from '@mui/material';
+import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Typography, Box } from '@mui/material';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
 import { useAuth } from '../../context/AuthContext';
+import DynamicSegmentForm from './DynamicSegmentForm';
+
+const sampleData = [
+  {
+    accountId: "12345",
+    msf: 75.99,
+    tenure: 24,
+    brand: "TELUS",
+    lineOfBusiness: "Mobility",
+    accountType: "Consumer",
+    accountSubType: "Postpaid",
+    numberOfSubscribers: 2,
+    geography: "Ontario",
+    isActive: true
+  },
+  {
+    accountId: "12346",
+    msf: 125.99,
+    tenure: 12,
+    brand: "Koodo",
+    lineOfBusiness: "Home Solution",
+    accountType: "Business",
+    accountSubType: "Other",
+    numberOfSubscribers: 1,
+    geography: "British Columbia",
+    isActive: false
+  }
+];
 
 const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
   const { currentUser } = useAuth();
-  const [formData, setFormData] = useState(
-    initialData || {
-      segmentName: '',
-      description: '',
-      status: 'active',
-      source: '',
-      brand: [],
-      lineOfBusiness: [],
-      accountType: [],
-      accountSubType: [],
-      numberOfSubscribers: '',
-      geography: [],
-      msfAmount: {
-        operator: '>=',
-        value1: '',
-        value2: ''
-      },
-      triggers: [],
-      existingSegments: []
-    }
-  );
+  const [formData, setFormData] = useState({
+    segmentName: '',
+    description: '',
+    status: 'active',
+    triggers: [],
+    existingSegments: []
+  });
+  const [generatedPayload, setGeneratedPayload] = useState(null);
+  const [dynamicFilters, setDynamicFilters] = useState(null);
+  const [filteredData, setFilteredData] = useState(null);
 
-  const handleChange = (event) => {
+  const handleBasicInfoChange = (event) => {
     const { name, value } = event.target;
-    if (name.startsWith('msfAmount.')) {
-      const [, field] = name.split('.');
-      setFormData({
-        ...formData,
-        msfAmount: { ...formData.msfAmount, [field]: value }
-      });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const [generatedPayload, setGeneratedPayload] = useState(null);
+  const handleDynamicFilterSubmit = (filters, filtered) => {
+    setDynamicFilters(filters);
+    setFilteredData(filtered);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const payload = generatePayload('segment', formData, currentUser);
+    const segmentData = {
+      ...formData,
+      filters: dynamicFilters,
+      filteredAccounts: filteredData?.map(d => d.accountId) || []
+    };
+    
+    const payload = generatePayload('segment', segmentData, currentUser);
     logPayload(payload);
     setGeneratedPayload(payload);
-    onSubmit(formData);
+    onSubmit(segmentData);
   };
 
   return (
-    <>
+    <Box>
       <Typography variant="h5" gutterBottom>
         {initialData ? 'Edit Segment' : 'Create New Segment'}
       </Typography>
+
       <form onSubmit={handleSubmit}>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Segment Name"
-            name="segmentName"
-            value={formData.segmentName}
-            onChange={handleChange}
-            required
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            multiline
-            rows={4}
-            required
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Brand</InputLabel>
-            <Select
-              multiple
-              name="brand"
-              value={formData.brand}
-              onChange={handleChange}
-              input={<OutlinedInput label="Brand" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {['TELUS', 'Koodo'].map((brand) => (
-                <MenuItem key={brand} value={brand}>
-                  <Checkbox checked={formData.brand.indexOf(brand) > -1} />
-                  <ListItemText primary={brand} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Line of Business</InputLabel>
-            <Select
-              multiple
-              name="lineOfBusiness"
-              value={formData.lineOfBusiness}
-              onChange={handleChange}
-              input={<OutlinedInput label="Line of Business" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {['Mobility', 'Home Solution', 'Subscription on Demand'].map((lob) => (
-                <MenuItem key={lob} value={lob}>
-                  <Checkbox checked={formData.lineOfBusiness.indexOf(lob) > -1} />
-                  <ListItemText primary={lob} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Account Type</InputLabel>
-            <Select
-              multiple
-              name="accountType"
-              value={formData.accountType}
-              onChange={handleChange}
-              input={<OutlinedInput label="Account Type" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {['Business', 'Corporate', 'Consumer'].map((type) => (
-                <MenuItem key={type} value={type}>
-                  <Checkbox checked={formData.accountType.indexOf(type) > -1} />
-                  <ListItemText primary={type} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Account Sub-type</InputLabel>
-            <Select
-              multiple
-              name="accountSubType"
-              value={formData.accountSubType}
-              onChange={handleChange}
-              input={<OutlinedInput label="Account Sub-type" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {['Residential', 'Other'].map((subType) => (
-                <MenuItem key={subType} value={subType}>
-                  <Checkbox checked={formData.accountSubType.indexOf(subType) > -1} />
-                  <ListItemText primary={subType} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Number of subscribers</InputLabel>
-            <Select
-              name="numberOfSubscribers"
-              value={formData.numberOfSubscribers}
-              onChange={handleChange}
-            >
-              {['1', '2', '3', '4', '5', '5+'].map((num) => (
-                <MenuItem key={num} value={num}>{num}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Geography</InputLabel>
-            <Select
-              multiple
-              name="geography"
-              value={formData.geography}
-              onChange={handleChange}
-              input={<OutlinedInput label="Geography" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Nova Scotia', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan'].map((province) => (
-                <MenuItem key={province} value={province}>
-                  <Checkbox checked={formData.geography.indexOf(province) > -1} />
-                  <ListItemText primary={province} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={4}>
-              <FormControl fullWidth>
-                <InputLabel>MSF Amount</InputLabel>
-                <Select
-                  name="msfAmount.operator"
-                  value={formData.msfAmount.operator}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="MSF Amount" />}
-                >
-                  <MenuItem value=">=">≥</MenuItem>
-                  <MenuItem value="<=">≤</MenuItem>
-                  <MenuItem value="between">Between</MenuItem>
-                  <MenuItem value="=">Equal to</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={formData.msfAmount.operator === 'between' ? 4 : 8}>
-              <TextField
-                fullWidth
-                label={formData.msfAmount.operator === 'between' ? "From" : "Amount"}
-                name="msfAmount.value1"
-                type="number"
-                value={formData.msfAmount.value1}
-                onChange={handleChange}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">$</InputAdornment>
-                }}
-              />
-            </Grid>
-            {formData.msfAmount.operator === 'between' && (
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="To"
-                  name="msfAmount.value2"
-                  type="number"
-                  value={formData.msfAmount.value2}
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>
-                  }}
-                />
-              </Grid>
-            )}
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Segment Name"
+              name="segmentName"
+              value={formData.segmentName}
+              onChange={handleBasicInfoChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Description"
+              name="description"
+              value={formData.description}
+              onChange={handleBasicInfoChange}
+              multiline
+              rows={4}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Triggers</InputLabel>
+              <Select
+                name="triggers"
+                value={formData.triggers}
+                onChange={handleBasicInfoChange}
+                multiple
+              >
+                {availableTriggers.map((trigger) => (
+                  <MenuItem key={trigger.id} value={trigger.id}>
+                    {trigger.triggerName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth required>
+              <InputLabel>Status</InputLabel>
+              <Select
+                name="status"
+                value={formData.status}
+                onChange={handleBasicInfoChange}
+              >
+                <MenuItem value="active">Active</MenuItem>
+                <MenuItem value="inactive">Inactive</MenuItem>
+                <MenuItem value="draft">Draft</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Triggers</InputLabel>
-            <Select
-              multiple
-              name="triggers"
-              value={formData.triggers}
-              onChange={handleChange}
-              input={<OutlinedInput label="Triggers" />}
-              renderValue={(selected) => selected.map(id => availableTriggers.find(t => t.id === id)?.triggerName).join(', ')}
-            >
-              {availableTriggers.map((trigger) => (
-                <MenuItem key={trigger.id} value={trigger.id}>
-                  <Checkbox checked={formData.triggers.indexOf(trigger.id) > -1} />
-                  <ListItemText primary={`${trigger.triggerName} (${trigger.type})`} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Existing Segments</InputLabel>
-            <Select
-              multiple
-              name="existingSegments"
-              value={formData.existingSegments}
-              onChange={handleChange}
-              input={<OutlinedInput label="Existing Segments" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {availableSegments
-                .filter(segment => segment.id !== currentSegmentId)
-                .map((segment) => (
-                  <MenuItem key={segment.id} value={segment.id}>
-                    <Checkbox checked={formData.existingSegments.indexOf(segment.id) > -1} />
-                    <ListItemText primary={segment.segmentName} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required>
-            <InputLabel>Status</InputLabel>
-            <Select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
-              <MenuItem value="draft">Draft</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
+
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <DynamicSegmentForm
+            data={sampleData}
+            onSubmit={handleDynamicFilterSubmit}
+          />
+        </Box>
+
+        <Box sx={{ mt: 2 }}>
           <Button type="submit" variant="contained" color="primary">
-            {initialData ? 'Update' : 'Submit'}
+            {initialData ? 'Update' : 'Create Segment'}
           </Button>
-          <Button onClick={onCancel} variant="outlined" style={{ marginLeft: '10px' }}>
+          <Button 
+            onClick={onCancel} 
+            variant="outlined" 
+            sx={{ ml: 2 }}
+          >
             Cancel
           </Button>
-        </Grid>
-      </Grid>
+        </Box>
       </form>
+
       {generatedPayload && (
         <Box sx={{ mt: 4, mb: 2 }}>
           <Typography variant="h6" gutterBottom>
@@ -316,7 +161,7 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
           <PayloadViewer payload={generatedPayload} />
         </Box>
       )}
-    </>
+    </Box>
   );
 };
 

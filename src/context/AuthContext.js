@@ -14,7 +14,15 @@ const loadFromLocalStorage = (key, defaultValue) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(() => loadFromLocalStorage('currentUser', null));
+  const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = loadFromLocalStorage('currentUser', null);
+    if (savedUser) {
+      // Ensure email is included in the loaded user object
+      const userEmail = Object.keys(users).find(email => users[email].role === savedUser.role);
+      return { ...savedUser, email: userEmail };
+    }
+    return null;
+  });
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!loadFromLocalStorage('isAuthenticated', false));
   const [authError, setAuthError] = useState(null);
 

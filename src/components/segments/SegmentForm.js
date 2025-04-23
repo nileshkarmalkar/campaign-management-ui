@@ -5,7 +5,7 @@ import PayloadViewer from '../PayloadViewer';
 import { useAuth } from '../../context/AuthContext';
 
 const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [formData, setFormData] = useState(
     initialData || {
       segmentName: '',
@@ -45,7 +45,7 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const payload = generatePayload('segment', formData, user);
+    const payload = generatePayload('segment', formData, currentUser);
     logPayload(payload);
     setGeneratedPayload(payload);
     onSubmit(formData);

@@ -18,7 +18,7 @@ import PayloadViewer from '../PayloadViewer';
 
 const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
   const { segments } = useAppContext();
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     segmentId: '',
     segmentName: '',
@@ -54,7 +54,7 @@ const SegmentOfferMappingForm = ({ onSubmit, onCancel }) => {
       status: 'Created',
       endDate: null
     };
-    const payload = generatePayload('offer', submitData, user);
+    const payload = generatePayload('offer', submitData, currentUser);
     logPayload(payload);
     setGeneratedPayload(payload);
     onSubmit(submitData);

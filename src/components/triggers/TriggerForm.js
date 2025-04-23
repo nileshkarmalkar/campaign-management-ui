@@ -7,7 +7,7 @@ import PayloadViewer from '../PayloadViewer';
 import { useAuth } from '../../context/AuthContext';
 
 const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [formData, setFormData] = useState(() => {
     const defaultData = {
       triggerName: '',
@@ -43,7 +43,7 @@ const TriggerForm = ({ onSubmit, onCancel, initialData = null }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const payload = generatePayload('trigger', formData, user);
+    const payload = generatePayload('trigger', formData, currentUser);
     logPayload(payload);
     setGeneratedPayload(payload);
     onSubmit(formData);

@@ -55,6 +55,10 @@ A React-based web application for managing marketing campaigns, segments, trigge
 - Real-time payload preview and validation
 - Export payload data for external systems
 - Track payload version history
+- User action tracking in payloads:
+  * Automatically includes user email and role
+  * Tracks who created or modified each item
+  * Maintains audit trail of changes
 
 ### 8. Campaign Workflow
 - Guided workflow for campaign creation

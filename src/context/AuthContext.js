@@ -31,7 +31,8 @@ export const AuthProvider = ({ children }) => {
   const login = (email) => {
     const user = users[email];
     if (user) {
-      setCurrentUser(user);
+      const userWithEmail = { ...user, email };
+      setCurrentUser(userWithEmail);
       setIsAuthenticated(true);
       setAuthError(null);
       localStorage.setItem('isAuthenticated', JSON.stringify(true));

@@ -1,13 +1,14 @@
 const generateSampleData = () => {
   const data = [];
-  const brands = ['Rogers', 'Fido', 'Chatr'];
-  const lobs = ['Wireless', 'Cable', 'Internet', 'Home Phone'];
+  const brands = ['TELUS', 'Koodo'];
+  const lobs = ['Mobility', 'Home Solution', 'Subscription on Demand'];
+  const paymentModes = ['Prepaid', 'Postpaid'];
   const accountTypes = ['Consumer', 'Business', 'Enterprise'];
-  const accountSubTypes = ['Individual', 'Family', 'Small Business', 'Corporate'];
+  const accountSubTypes = ['Individual', 'Small Business', 'Corporate'];
   const geographies = ['ON', 'BC', 'AB', 'QC', 'NS', 'MB', 'SK', 'NL', 'NB', 'PE'];
 
   for (let i = 0; i < 1000; i++) {
-    const tenure = Math.floor(Math.random() * 14); // Random tenure between 0 and 13 years
+    const tenure = Math.floor(Math.random() * 4); // Random tenure between 0 and 3 years
 
     data.push({
       accountId: `ACC${String(i + 1000).padStart(6, '0')}`,
@@ -15,6 +16,7 @@ const generateSampleData = () => {
       tenure: tenure,
       brand: brands[Math.floor(Math.random() * brands.length)],
       lineOfBusiness: lobs[Math.floor(Math.random() * lobs.length)],
+      paymentMode: paymentModes[Math.floor(Math.random() * paymentModes.length)],
       accountType: accountTypes[Math.floor(Math.random() * accountTypes.length)],
       accountSubType: accountSubTypes[Math.floor(Math.random() * accountSubTypes.length)],
       numberOfSubscribers: Math.floor(Math.random() * 10) + 1,

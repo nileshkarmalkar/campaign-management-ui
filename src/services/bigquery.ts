@@ -1,21 +1,33 @@
+import { BigQuery } from '@google-cloud/bigquery';
 import { sampleDatasets } from '../utils/sampleData';
 import { bigQueryConfig } from '../config/bigquery';
 
 class DataService {
   private isUsingBigQuery: boolean;
+  private bigquery: BigQuery | null = null;
 
   constructor() {
     this.isUsingBigQuery = !!bigQueryConfig.projectId && !!bigQueryConfig.datasetId;
-    if (!this.isUsingBigQuery) {
+    if (this.isUsingBigQuery) {
+      try {
+        this.bigquery = new BigQuery({
+          projectId: bigQueryConfig.projectId,
+        });
+      } catch (error) {
+        console.error('Failed to initialize BigQuery:', error);
+        this.isUsingBigQuery = false;
+      }
+    } else {
       console.warn('BigQuery credentials not provided. Using sample data instead.');
     }
   }
 
   async getCustomerData(): Promise<any[]> {
     if (this.isUsingBigQuery) {
-      // TODO: Implement actual BigQuery call here
-      console.log('Fetching customer data from BigQuery');
-      // For now, we'll still return sample data
+      if (!this.bigquery) throw new Error('BigQuery client not initialized');
+      const query = `SELECT * FROM \`${bigQueryConfig.projectId}.${bigQueryConfig.datasetId}.customer_data\``;
+      const [rows] = await this.bigquery.query({ query });
+      return rows;
     }
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -24,9 +36,10 @@ class DataService {
 
   async getChurnData(): Promise<any[]> {
     if (this.isUsingBigQuery) {
-      // TODO: Implement actual BigQuery call here
-      console.log('Fetching churn data from BigQuery');
-      // For now, we'll still return sample data
+      if (!this.bigquery) throw new Error('BigQuery client not initialized');
+      const query = `SELECT * FROM \`${bigQueryConfig.projectId}.${bigQueryConfig.datasetId}.churn_data\``;
+      const [rows] = await this.bigquery.query({ query });
+      return rows;
     }
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -35,13 +48,14 @@ class DataService {
 
   async executeQuery(query: string): Promise<any[]> {
     if (this.isUsingBigQuery) {
+      if (!this.bigquery) throw new Error('BigQuery client not initialized');
       console.log('Executing query on BigQuery:', query);
-      // TODO: Implement actual BigQuery query execution
-      // For now, we'll return customer data as a sample
+      const [rows] = await this.bigquery.query({ query });
+      return rows;
     } else {
       console.log('Query to be executed (using sample data):', query);
+      return this.getCustomerData();
     }
-    return this.getCustomerData();
   }
 }
 

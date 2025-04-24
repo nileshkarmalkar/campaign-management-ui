@@ -6,7 +6,7 @@ import { ColumnMetadata, FilterConfig, FilterState, FilterGroup, FilterCondition
 import dayjs from 'dayjs';
 import DataTable from './DataTable';
 import FilterPanel from './FilterPanel';
-import { sampleData } from '../../../utils/sampleData';
+import { sampleDatasets } from '../../../utils/sampleData';
 
 interface DynamicSegmentFormProps {
   onSubmit: (filters: FilterState, filteredData: Record<string, any>[]) => void;
@@ -15,6 +15,7 @@ interface DynamicSegmentFormProps {
 }
 
 const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initialFilters, initialFilteredData }) => {
+  const [selectedDataset, setSelectedDataset] = useState<'customerData' | 'churnModelData'>('customerData');
   const [data, setData] = useState<Record<string, any>[]>([]);
   const [columns, setColumns] = useState<ColumnMetadata[]>([]);
   const [filterConfigs, setFilterConfigs] = useState<FilterConfig[]>([]);
@@ -24,8 +25,8 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   });
 
   useEffect(() => {
-    setData(sampleData);
-  }, []);
+    setData(sampleDatasets[selectedDataset]);
+  }, [selectedDataset]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -184,6 +185,17 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Define filters to select accounts for your segment
         </Typography>
+        <FormControl fullWidth sx={{ mt: 2 }}>
+          <InputLabel>Dataset</InputLabel>
+          <Select
+            value={selectedDataset}
+            onChange={(e) => setSelectedDataset(e.target.value as 'customerData' | 'churnModelData')}
+            label="Dataset"
+          >
+            <MenuItem value="customerData">Customer Data</MenuItem>
+            <MenuItem value="churnModelData">Churn Model Data</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
 
       <Grid container spacing={3}>

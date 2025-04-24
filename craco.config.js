@@ -19,6 +19,7 @@ module.exports = {
         new webpack.ProvidePlugin({
           process: 'process/browser',
           Buffer: ['buffer', 'Buffer'],
+          stream: ['stream-browserify'],
         })
       );
 

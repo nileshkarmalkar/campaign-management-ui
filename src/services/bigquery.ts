@@ -1,57 +1,23 @@
-import { BigQuery } from '@google-cloud/bigquery';
+import { sampleDatasets } from '../utils/sampleData';
 
-class BigQueryService {
-  private bigquery: BigQuery;
-  private projectId: string;
-  private datasetId: string;
-
-  constructor(projectId: string, datasetId: string) {
-    this.projectId = projectId;
-    this.datasetId = datasetId;
-    this.bigquery = new BigQuery({
-      projectId: this.projectId,
-    });
-  }
-
+class DataService {
   async getCustomerData(): Promise<any[]> {
-    const query = `
-      SELECT *
-      FROM \`${this.projectId}.${this.datasetId}.customer_data\`
-    `;
-    
-    try {
-      const [rows] = await this.bigquery.query({ query });
-      return rows;
-    } catch (error) {
-      console.error('Error fetching customer data:', error);
-      throw error;
-    }
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return sampleDatasets.customerData;
   }
 
   async getChurnData(): Promise<any[]> {
-    const query = `
-      SELECT *
-      FROM \`${this.projectId}.${this.datasetId}.churn_data\`
-    `;
-    
-    try {
-      const [rows] = await this.bigquery.query({ query });
-      return rows;
-    } catch (error) {
-      console.error('Error fetching churn data:', error);
-      throw error;
-    }
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return sampleDatasets.churnModelData;
   }
 
   async executeQuery(query: string): Promise<any[]> {
-    try {
-      const [rows] = await this.bigquery.query({ query });
-      return rows;
-    } catch (error) {
-      console.error('Error executing query:', error);
-      throw error;
-    }
+    console.log('Query to be executed:', query);
+    // For now, return customer data as a sample
+    return this.getCustomerData();
   }
 }
 
-export default BigQueryService;
+export default DataService;

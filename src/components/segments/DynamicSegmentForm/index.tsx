@@ -6,8 +6,7 @@ import { ColumnMetadata, FilterConfig, FilterState, FilterGroup, FilterCondition
 import dayjs from 'dayjs';
 import DataTable from './DataTable';
 import FilterPanel from './FilterPanel';
-import BigQueryService from '../../../services/bigquery';
-import { bigQueryConfig } from '../../../config/bigquery';
+import DataService from '../../../services/bigquery';
 
 interface DynamicSegmentFormProps {
   onSubmit: (filters: FilterState, filteredData: Record<string, any>[]) => void;
@@ -16,7 +15,7 @@ interface DynamicSegmentFormProps {
 }
 
 const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initialFilters, initialFilteredData }) => {
-  const [selectedDataset, setSelectedDataset] = useState<'customer_data' | 'churn_data'>('customer_data');
+  const [selectedDataset, setSelectedDataset] = useState<'customerData' | 'churnModelData'>('customerData');
   const [data, setData] = useState<Record<string, any>[]>([]);
   const [columns, setColumns] = useState<ColumnMetadata[]>([]);
   const [filterConfigs, setFilterConfigs] = useState<FilterConfig[]>([]);
@@ -27,7 +26,7 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const bigQueryService = useMemo(() => new BigQueryService(bigQueryConfig.projectId, bigQueryConfig.datasetId), []);
+  const dataService = useMemo(() => new DataService(), []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,14 +34,14 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
       setError(null);
       try {
         let fetchedData;
-        if (selectedDataset === 'customer_data') {
-          fetchedData = await bigQueryService.getCustomerData();
+        if (selectedDataset === 'customerData') {
+          fetchedData = await dataService.getCustomerData();
         } else {
-          fetchedData = await bigQueryService.getChurnData();
+          fetchedData = await dataService.getChurnData();
         }
         setData(fetchedData);
       } catch (err) {
-        setError('Failed to fetch data from BigQuery');
+        setError('Failed to fetch data');
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -50,7 +49,7 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
     };
 
     fetchData();
-  }, [selectedDataset, bigQueryService]);
+  }, [selectedDataset, dataService]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -213,11 +212,11 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
           <InputLabel>Dataset</InputLabel>
           <Select
             value={selectedDataset}
-            onChange={(e) => setSelectedDataset(e.target.value as 'customer_data' | 'churn_data')}
+            onChange={(e) => setSelectedDataset(e.target.value as 'customerData' | 'churnModelData')}
             label="Dataset"
           >
-            <MenuItem value="customer_data">Customer Data</MenuItem>
-            <MenuItem value="churn_data">Churn Model Data</MenuItem>
+            <MenuItem value="customerData">Customer Data</MenuItem>
+            <MenuItem value="churnModelData">Churn Model Data</MenuItem>
           </Select>
         </FormControl>
         {isLoading && <Typography>Loading data...</Typography>}

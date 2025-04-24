@@ -6,7 +6,7 @@ import { ColumnMetadata, FilterConfig, FilterState, FilterGroup, FilterCondition
 import dayjs from 'dayjs';
 import DataTable from './DataTable';
 import FilterPanel from './FilterPanel';
-import DataService from '../../../services/bigquery';
+import dataService from '../../../services/bigquery';
 
 interface DynamicSegmentFormProps {
   onSubmit: (filters: FilterState, filteredData: Record<string, any>[]) => void;
@@ -15,7 +15,8 @@ interface DynamicSegmentFormProps {
 }
 
 const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initialFilters, initialFilteredData }) => {
-  const [selectedDataset, setSelectedDataset] = useState<'customerData' | 'churnModelData'>('customerData');
+  const [tables, setTables] = useState<string[]>([]);
+  const [selectedTable, setSelectedTable] = useState<string>('');
   const [data, setData] = useState<Record<string, any>[]>([]);
   const [columns, setColumns] = useState<ColumnMetadata[]>([]);
   const [filterConfigs, setFilterConfigs] = useState<FilterConfig[]>([]);
@@ -26,20 +27,40 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const dataService = useMemo(() => new DataService(), []);
+  const fetchTables = useCallback(async () => {
+    setError(null);
+    try {
+      const result = await dataService.listTables();
+      setTables(result);
+      if (result.length > 0 && !selectedTable) {
+        setSelectedTable(result[0]);
+      }
+    } catch (err) {
+      setError('Failed to fetch tables');
+      console.error(err);
+    }
+  }, [selectedTable]);
+
+  // Initial fetch when component mounts
+  useEffect(() => {
+    fetchTables();
+  }, [fetchTables]);
+
+  // Poll for table updates every 30 seconds
+  useEffect(() => {
+    const intervalId = setInterval(fetchTables, 30000);
+    return () => clearInterval(intervalId);
+  }, [fetchTables]);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedTable) return;
       setIsLoading(true);
       setError(null);
       try {
-        let fetchedData;
-        if (selectedDataset === 'customerData') {
-          fetchedData = await dataService.getCustomerData();
-        } else {
-          fetchedData = await dataService.getChurnData();
-        }
-        setData(fetchedData);
+        await dataService.setCurrentTable(selectedTable);
+        const result = await dataService.getCustomerData(1000);
+        setData(result);
       } catch (err) {
         setError('Failed to fetch data');
         console.error(err);
@@ -49,7 +70,7 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
     };
 
     fetchData();
-  }, [selectedDataset, dataService]);
+  }, [selectedTable]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -160,19 +181,47 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
 
   const handleFilterChange = (field: string, value: any, operator: ComparisonOperator) => {
     setFilterState(prevState => {
-      const newActiveFilters = {
-        ...prevState.activeFilters,
-        [field]: { ...prevState.activeFilters[field], value, operator }
-      };
+      const currentFilter = prevState.activeFilters[field];
+      let newActiveFilters = { ...prevState.activeFilters };
 
+      // If operator is changing, reset the value
+      if (operator !== currentFilter.operator) {
+        newActiveFilters[field] = {
+          ...currentFilter,
+          value: null,
+          operator: operator,
+          type: currentFilter.type
+        };
+      } else {
+        // If value is changing, keep the current operator
+        newActiveFilters[field] = {
+          ...currentFilter,
+          value: value,
+          operator: currentFilter.operator,
+          type: currentFilter.type
+        };
+      }
+
+      // Build conditions from active filters
       const newConditions = Object.entries(newActiveFilters)
-        .filter(([, filter]) => filter.value !== null)
+        .filter(([, filter]) => {
+          if (filter.value === null) return false;
+          if (Array.isArray(filter.value) && filter.value.length === 0) return false;
+          return true;
+        })
         .map(([field, filter]) => ({
           field,
           type: filter.type,
           operator: filter.operator,
           value: filter.value
         }));
+
+      console.log('New filter state:', {
+        field,
+        value,
+        operator,
+        conditions: newConditions
+      });
 
       return {
         root: {
@@ -181,6 +230,18 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
         },
         activeFilters: newActiveFilters
       };
+    });
+  };
+
+  // Add a reset button to clear all filters
+  const handleResetFilters = () => {
+    const initialActiveFilters: FilterState['activeFilters'] = {};
+    filterConfigs.forEach(config => {
+      initialActiveFilters[config.field] = { type: config.type, value: null, operator: '=' };
+    });
+    setFilterState({
+      root: { operator: 'AND', conditions: [] },
+      activeFilters: initialActiveFilters
     });
   };
 
@@ -209,14 +270,15 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
           Define filters to select accounts for your segment
         </Typography>
         <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel>Dataset</InputLabel>
+          <InputLabel>Table</InputLabel>
           <Select
-            value={selectedDataset}
-            onChange={(e) => setSelectedDataset(e.target.value as 'customerData' | 'churnModelData')}
-            label="Dataset"
+            value={selectedTable}
+            onChange={(e) => setSelectedTable(e.target.value)}
+            label="Table"
           >
-            <MenuItem value="customerData">Customer Data</MenuItem>
-            <MenuItem value="churnModelData">Churn Model Data</MenuItem>
+            {tables.map((table) => (
+              <MenuItem key={table} value={table}>{table}</MenuItem>
+            ))}
           </Select>
         </FormControl>
         {isLoading && <Typography>Loading data...</Typography>}
@@ -261,7 +323,15 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleResetFilters}
+          size="large"
+        >
+          Reset Filters
+        </Button>
         <Button
           variant="contained"
           color="primary"

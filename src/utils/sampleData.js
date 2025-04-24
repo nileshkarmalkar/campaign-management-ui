@@ -1,4 +1,4 @@
-const generateCustomerData = () => {
+export const generateCustomerData = () => {
   const data = [];
   const brands = ['TELUS', 'Koodo'];
   const lobs = ['Mobility', 'Home Solution', 'Subscription on Demand'];
@@ -28,7 +28,7 @@ const generateCustomerData = () => {
   return data;
 };
 
-const generateChurnModelData = () => {
+export const generateChurnModelData = () => {
   const data = [];
   const customerData = generateCustomerData();
 

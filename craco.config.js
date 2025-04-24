@@ -11,6 +11,7 @@ module.exports = {
         path: require.resolve('path-browserify'),
         buffer: require.resolve('buffer/'),
         process: require.resolve('process/browser'),
+        stream: require.resolve('stream-browserify'),
       };
 
       // Add plugins

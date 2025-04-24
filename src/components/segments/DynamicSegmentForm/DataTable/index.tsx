@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import {
   Table,
   TableBody,
@@ -33,6 +34,10 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns }) => {
         return typeof value === 'number' ? value.toLocaleString() : value;
       case 'boolean':
         return value ? 'Yes' : 'No';
+      case 'date':
+        return dayjs(value, 'YYYY-MM-DD', true).isValid() 
+          ? dayjs(value).format('MMM D, YYYY')
+          : value;
       default:
         return String(value);
     }

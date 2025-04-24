@@ -11,46 +11,42 @@ import {
   OutlinedInput,
   SelectChangeEvent
 } from '@mui/material';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend
-} from 'recharts';
-import { FilterConfig } from '../utils/types';
+import { FilterConfig, ComparisonOperator } from '../utils/types';
 
 interface CategoryFilterProps {
   config: FilterConfig;
   value: string[] | null;
-  onChange: (value: string[]) => void;
+  onChange: (value: string[], operator: ComparisonOperator) => void;
 }
-
-const COLORS = ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0', '#607d8b'];
 
 const CategoryFilter: React.FC<CategoryFilterProps> = ({ config, value, onChange }) => {
   if (!config.options) return null;
 
   const selectedValues = value || [];
+  const operator = config.operator || 'in';
 
-  const chartData = config.options.map((option, index) => ({
-    name: String(option),
-    value: 1,
-    color: COLORS[index % COLORS.length],
-    isSelected: selectedValues.includes(String(option))
-  }));
-
-  const handleChange = (event: SelectChangeEvent<string[]>) => {
-    const newValue = event.target.value as string[];
-    onChange(newValue);
+  const handleChange = (event: SelectChangeEvent<string | string[]>) => {
+    const newValue = event.target.value;
+    const updatedValue = operator === '=' ? [newValue as string] : newValue as string[];
+    onChange(updatedValue, operator);
   };
 
   const handleCheckboxChange = (option: string) => {
-    const newValue = selectedValues.includes(option)
-      ? selectedValues.filter(v => v !== option)
-      : [...selectedValues, option];
-    onChange(newValue);
+    let newValue: string[];
+    if (operator === '=') {
+      newValue = [option];
+    } else {
+      newValue = selectedValues.includes(option)
+        ? selectedValues.filter(v => v !== option)
+        : [...selectedValues, option];
+    }
+    onChange(newValue, operator);
+  };
+
+  const handleOperatorChange = (event: SelectChangeEvent<ComparisonOperator>) => {
+    const newOperator = event.target.value as ComparisonOperator;
+    const newValue = newOperator === '=' ? (selectedValues.length > 0 ? [selectedValues[0]] : []) : selectedValues;
+    onChange(newValue, newOperator);
   };
 
   const renderCheckboxes = () => (
@@ -72,17 +68,22 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ config, value, onChange
 
   const renderSelect = () => (
     <Select
-      multiple
-      value={selectedValues}
+      multiple={operator !== '='}
+      value={operator === '=' ? (selectedValues[0] || '') : selectedValues}
       onChange={handleChange}
       input={<OutlinedInput />}
-      renderValue={(selected) => (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-          {(selected as string[]).map((value) => (
-            <Chip key={value} label={value} size="small" />
-          ))}
-        </Box>
-      )}
+      renderValue={(selected) => {
+        if (operator === '=') {
+          return selected as string;
+        }
+        return (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {(selected as string[]).map((value) => (
+              <Chip key={value} label={value} size="small" />
+            ))}
+          </Box>
+        );
+      }}
       sx={{ width: '100%', mt: 1 }}
     >
       {config.options?.map((option) => (
@@ -95,38 +96,24 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ config, value, onChange
 
   return (
     <Box sx={{ mt: 3, mb: 2 }}>
-      <Typography variant="subtitle2" gutterBottom>
-        {config.field}
-      </Typography>
-
-      <Box sx={{ height: 150, mb: 2 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={50}
-            >
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color}
-                  opacity={entry.isSelected ? 1 : 0.3}
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="subtitle2">
+          {config.field}
+        </Typography>
+        <Select
+          value={operator}
+          onChange={handleOperatorChange}
+          size="small"
+        >
+          <MenuItem value="=">Is Equal To</MenuItem>
+          <MenuItem value="in">Includes</MenuItem>
+          <MenuItem value="not_in">Excludes</MenuItem>
+        </Select>
       </Box>
 
       {config.component === 'checkbox' ? renderCheckboxes() : renderSelect()}
 
-      <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
+      <Typography variant="caption" color="textSecondary" sx={{ mt: 2, display: 'block' }}>
         Selected: {selectedValues.length} of {config.options.length}
       </Typography>
     </Box>

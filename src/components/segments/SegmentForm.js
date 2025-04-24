@@ -3,43 +3,16 @@ import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Typ
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
 import { useAuth } from '../../context/AuthContext';
-import DynamicSegmentForm from './DynamicSegmentForm';
-
-const sampleData = [
-  {
-    accountId: "12345",
-    msf: 75.99,
-    tenure: 24,
-    brand: "TELUS",
-    lineOfBusiness: "Mobility",
-    accountType: "Consumer",
-    accountSubType: "Postpaid",
-    numberOfSubscribers: 2,
-    geography: "Ontario",
-    isActive: true
-  },
-  {
-    accountId: "12346",
-    msf: 125.99,
-    tenure: 12,
-    brand: "Koodo",
-    lineOfBusiness: "Home Solution",
-    accountType: "Business",
-    accountSubType: "Other",
-    numberOfSubscribers: 1,
-    geography: "British Columbia",
-    isActive: false
-  }
-];
+import DynamicSegmentForm from './DynamicSegmentForm/index.tsx';
 
 const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
-    segmentName: '',
-    description: '',
-    status: 'active',
-    triggers: [],
-    existingSegments: []
+    segmentName: initialData?.segmentName || '',
+    description: initialData?.description || '',
+    status: initialData?.status || 'active',
+    triggers: initialData?.triggers || [],
+    existingSegments: initialData?.existingSegments || []
   });
   const [generatedPayload, setGeneratedPayload] = useState(null);
   const [dynamicFilters, setDynamicFilters] = useState(null);
@@ -130,12 +103,33 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel>Existing Segments</InputLabel>
+              <Select
+                multiple
+                name="existingSegments"
+                value={formData.existingSegments}
+                onChange={handleBasicInfoChange}
+              >
+                {availableSegments.filter(s => s.id !== currentSegmentId).map((segment) => (
+                  <MenuItem key={segment.id} value={segment.id}>
+                    {segment.segmentName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
 
         <Box sx={{ mt: 4, mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Filter Configuration
+          </Typography>
           <DynamicSegmentForm
-            data={sampleData}
             onSubmit={handleDynamicFilterSubmit}
+            initialFilters={initialData?.filters}
+            initialFilteredData={initialData?.filteredAccounts}
           />
         </Box>
 

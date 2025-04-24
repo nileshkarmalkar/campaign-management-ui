@@ -10,7 +10,6 @@ const Segments = () => {
   const { segments, addSegment, updateSegment, triggers } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('segmentName');
-  const [showEditForm, setShowEditForm] = useState(false);
   const [selectedSegment, setSelectedSegment] = useState(null);
 
   const filteredSegments = useMemo(() => {
@@ -30,32 +29,32 @@ const Segments = () => {
   };
 
   const handleAddSegment = () => {
+    setSelectedSegment(null);
     setShowForm(true);
   };
 
   const handleCancelForm = () => {
     setShowForm(false);
+    setSelectedSegment(null);
   };
 
   const handleSubmitForm = (formData) => {
     if (selectedSegment) {
       updateSegment({ ...formData, id: selectedSegment.id });
-      setShowEditForm(false);
-      setSelectedSegment(null);
     } else {
-      addSegment(formData);
-      setShowForm(false);
+      const newSegment = {
+        ...formData,
+        id: `segment-${Date.now()}`
+      };
+      addSegment(newSegment);
     }
+    setShowForm(false);
+    setSelectedSegment(null);
   };
 
   const handleEditSegment = (segment) => {
     setSelectedSegment(segment);
-    setShowEditForm(true);
-  };
-
-  const handleCancelEdit = () => {
-    setShowEditForm(false);
-    setSelectedSegment(null);
+    setShowForm(true);
   };
 
   const getStatusColor = (status) => {
@@ -85,8 +84,7 @@ const Segments = () => {
             label="Search By"
           >
             <MenuItem value="segmentName">Segment Name</MenuItem>
-            <MenuItem value="type">Segment Type</MenuItem>
-            <MenuItem value="source">Data Source</MenuItem>
+            <MenuItem value="description">Description</MenuItem>
             <MenuItem value="status">Status</MenuItem>
           </Select>
         </FormControl>
@@ -105,20 +103,21 @@ const Segments = () => {
         />
       </Box>
       {!showForm && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddSegment}
-          style={{ marginBottom: '20px' }}
-        >
-          Add New Segment
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddSegment}
+          >
+            Create Segment
+          </Button>
+        </Box>
       )}
-      {showForm || showEditForm ? (
+      {showForm ? (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
           <SegmentForm 
             onSubmit={handleSubmitForm} 
-            onCancel={showEditForm ? handleCancelEdit : handleCancelForm}
+            onCancel={handleCancelForm}
             availableTriggers={triggers}
             availableSegments={segments}
             currentSegmentId={selectedSegment?.id}
@@ -140,52 +139,75 @@ const Segments = () => {
                 <Typography style={{ color: getStatusColor(segment.status) }}>
                   Status: {segment.status}
                 </Typography>
-                <Typography>
-                  Brand: {Array.isArray(segment.brand) 
-                    ? segment.brand.join(', ')
-                    : segment.brand}
-                </Typography>
-                <Typography>
-                  Line of Business: {Array.isArray(segment.lineOfBusiness)
-                    ? segment.lineOfBusiness.join(', ')
-                    : segment.lineOfBusiness}
-                </Typography>
-                <Typography>
-                  Account Type: {Array.isArray(segment.accountType)
-                    ? segment.accountType.join(', ')
-                    : segment.accountType}
-                </Typography>
-                <Typography>
-                  Account Sub-type: {Array.isArray(segment.accountSubType)
-                    ? segment.accountSubType.join(', ')
-                    : segment.accountSubType}
-                </Typography>
-                {segment.numberOfSubscribers && (
-                  <Typography>Number of Subscribers: {segment.numberOfSubscribers}</Typography>
-                )}
-                <Typography>
-                  Geography: {Array.isArray(segment.geography)
-                    ? segment.geography.join(', ')
-                    : segment.geography}
-                </Typography>
-                {segment.msfAmount && (
-                  <Typography>
-                    MSF Amount: {(() => {
-                      const { operator, value1, value2 } = segment.msfAmount;
-                      switch (operator) {
-                        case '>=':
-                          return `≥ $${value1}`;
-                        case '<=':
-                          return `≤ $${value1}`;
-                        case '=':
-                          return `= $${value1}`;
-                        case 'between':
-                          return `$${value1} - $${value2}`;
-                        default:
-                          return 'Not specified';
-                      }
-                    })()}
-                  </Typography>
+                {segment.filters && segment.filters.root.conditions.length > 0 && (
+                  <Paper variant="outlined" sx={{ mt: 2, p: 2, bgcolor: 'background.default' }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, color: 'primary.main' }}>
+                      Filter Conditions
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                      Match {segment.filters.root.operator === 'AND' ? 'ALL' : 'ANY'} of the following conditions:
+                    </Typography>
+                    {segment.filters.root.conditions.map((condition, index) => (
+                      <Typography key={index} sx={{ 
+                        ml: 2, 
+                        fontSize: '0.9rem',
+                        py: 0.5,
+                        borderLeft: '2px solid',
+                        borderColor: 'primary.light',
+                        pl: 2,
+                        mb: 1
+                      }}>
+                        • {condition.field.replace(/([A-Z])/g, ' $1').toLowerCase()} {
+                          (() => {
+                            switch (condition.operator) {
+                              case '=': return 'is equal to';
+                              case '!=': return 'is not equal to';
+                              case '>': return 'is greater than';
+                              case '>=': return 'is greater than or equal to';
+                              case '<': return 'is less than';
+                              case '<=': return 'is less than or equal to';
+                              case 'between': return 'is between';
+                              case 'contains': return 'contains';
+                              case 'not_contains': return 'does not contain';
+                              case 'in': return 'is any of';
+                              case 'not_in': return 'is not any of';
+                              default: return condition.operator;
+                            }
+                          })()
+                        } {
+                          (() => {
+                            if (Array.isArray(condition.value)) {
+                              if (condition.operator === 'between') {
+                                return `${condition.value[0]} and ${condition.value[1]}`;
+                              }
+                              return condition.value.join(', ');
+                            }
+                            if (typeof condition.value === 'boolean') {
+                              return condition.value ? 'true' : 'false';
+                            }
+                            if (condition.type === 'date') {
+                              return new Date(condition.value).toLocaleDateString();
+                            }
+                            return condition.value;
+                          })()
+                        }
+                      </Typography>
+                    ))}
+                    <Box sx={{ 
+                      mt: 2, 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      bgcolor: 'success.light',
+                      color: 'success.contrastText',
+                      py: 1,
+                      px: 2,
+                      borderRadius: 1
+                    }}>
+                      <Typography variant="body2">
+                        Matching Accounts: {segment.filteredAccounts?.length || 0}
+                      </Typography>
+                    </Box>
+                  </Paper>
                 )}
                 {segment.triggers && Array.isArray(segment.triggers) && segment.triggers.length > 0 && (
                   <Typography>

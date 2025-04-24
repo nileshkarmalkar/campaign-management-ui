@@ -4,9 +4,11 @@ import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import SegmentForm from './SegmentForm';
+import DynamicSegmentForm from './DynamicSegmentForm';
 
 const Segments = () => {
   const [showForm, setShowForm] = useState(false);
+  const [showDynamicForm, setShowDynamicForm] = useState(false);
   const { segments, addSegment, updateSegment, triggers } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('segmentName');
@@ -31,10 +33,18 @@ const Segments = () => {
   const handleAddSegment = () => {
     setSelectedSegment(null);
     setShowForm(true);
+    setShowDynamicForm(false);
+  };
+
+  const handleAddDynamicSegment = () => {
+    setSelectedSegment(null);
+    setShowForm(false);
+    setShowDynamicForm(true);
   };
 
   const handleCancelForm = () => {
     setShowForm(false);
+    setShowDynamicForm(false);
     setSelectedSegment(null);
   };
 
@@ -49,7 +59,23 @@ const Segments = () => {
       addSegment(newSegment);
     }
     setShowForm(false);
+    setShowDynamicForm(false);
     setSelectedSegment(null);
+  };
+
+  const handleSubmitDynamicForm = (filters, filteredData) => {
+    const newSegment = {
+      id: `segment-${Date.now()}`,
+      segmentName: `Dynamic Segment ${segments.length + 1}`,
+      description: 'Dynamically created segment',
+      status: 'active',
+      filters: filters,
+      filteredAccounts: filteredData.length,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    addSegment(newSegment);
+    setShowDynamicForm(false);
   };
 
   const handleEditSegment = (segment) => {
@@ -102,7 +128,7 @@ const Segments = () => {
           }}
         />
       </Box>
-      {!showForm && (
+      {!showForm && !showDynamicForm && (
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <Button
             variant="contained"
@@ -111,9 +137,16 @@ const Segments = () => {
           >
             Create Segment
           </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleAddDynamicSegment}
+          >
+            Create Dynamic Segment
+          </Button>
         </Box>
       )}
-      {showForm ? (
+      {showForm && (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
           <SegmentForm 
             onSubmit={handleSubmitForm} 
@@ -124,7 +157,16 @@ const Segments = () => {
             initialData={selectedSegment}
           />
         </Paper>
-      ) : (
+      )}
+      {showDynamicForm && (
+        <Paper style={{ padding: '20px', marginBottom: '20px' }}>
+          <DynamicSegmentForm
+            onSubmit={handleSubmitDynamicForm}
+            onCancel={handleCancelForm}
+          />
+        </Paper>
+      )}
+      {!showForm && !showDynamicForm && (
         <Grid container spacing={3}>
           {filteredSegments.map((segment) => (
             <Grid item xs={12} key={segment.id}>

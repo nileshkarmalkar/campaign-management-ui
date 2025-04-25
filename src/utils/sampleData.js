@@ -286,3 +286,9 @@ export const clearAllData = () => {
   localStorage.removeItem('communications');
   localStorage.removeItem('offerMappings');
 };
+
+// Sample datasets for BigQuery service
+export const sampleDatasets = {
+  customerData: sampleSegments,
+  churnModelData: sampleSegments
+};

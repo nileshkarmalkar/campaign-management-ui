@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Layout from './components/layout/Layout';
@@ -21,7 +21,7 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AuthProvider>
         <AppProvider>
-          <Router basename="/campaign-management-ui/dynamic-segmentation">
+          <Router>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route element={<ProtectedRoutes />}>

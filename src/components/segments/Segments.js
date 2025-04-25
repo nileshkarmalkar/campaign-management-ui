@@ -37,16 +37,6 @@ const Segments = () => {
     setShowForm(false);
   };
 
-<<<<<<< Updated upstream
-  const handleSubmitForm = (formData) => {
-    if (selectedSegment) {
-      updateSegment({ ...formData, id: selectedSegment.id });
-      setShowEditForm(false);
-      setSelectedSegment(null);
-    } else {
-      addSegment(formData);
-      setShowForm(false);
-=======
   const handleSubmitForm = async (formData) => {
     try {
       if (selectedSegment) {
@@ -59,7 +49,6 @@ const Segments = () => {
     } catch (error) {
       console.error('Error saving segment:', error);
       // Error handling is done in SegmentForm
->>>>>>> Stashed changes
     }
   };
 
@@ -127,16 +116,6 @@ const Segments = () => {
         />
       </Box>
       {!showForm && (
-<<<<<<< Updated upstream
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddSegment}
-          style={{ marginBottom: '20px' }}
-        >
-          Add New Segment
-        </Button>
-=======
         <Box sx={{ mb: 2 }}>
           <Button
             variant="contained"
@@ -147,7 +126,6 @@ const Segments = () => {
             Create Segment
           </Button>
         </Box>
->>>>>>> Stashed changes
       )}
       {showForm || showEditForm ? (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
@@ -175,51 +153,14 @@ const Segments = () => {
                 <Typography style={{ color: getStatusColor(segment.status) }}>
                   Status: {segment.status}
                 </Typography>
-                <Typography>
-                  Brand: {Array.isArray(segment.brand) 
-                    ? segment.brand.join(', ')
-                    : segment.brand}
-                </Typography>
-                <Typography>
-                  Line of Business: {Array.isArray(segment.lineOfBusiness)
-                    ? segment.lineOfBusiness.join(', ')
-                    : segment.lineOfBusiness}
-                </Typography>
-                <Typography>
-                  Account Type: {Array.isArray(segment.accountType)
-                    ? segment.accountType.join(', ')
-                    : segment.accountType}
-                </Typography>
-                <Typography>
-                  Account Sub-type: {Array.isArray(segment.accountSubType)
-                    ? segment.accountSubType.join(', ')
-                    : segment.accountSubType}
-                </Typography>
-                {segment.numberOfSubscribers && (
-                  <Typography>Number of Subscribers: {segment.numberOfSubscribers}</Typography>
-                )}
-                <Typography>
-                  Geography: {Array.isArray(segment.geography)
-                    ? segment.geography.join(', ')
-                    : segment.geography}
-                </Typography>
-                {segment.msfAmount && (
+                {segment.filters && (
                   <Typography>
-                    MSF Amount: {(() => {
-                      const { operator, value1, value2 } = segment.msfAmount;
-                      switch (operator) {
-                        case '>=':
-                          return `≥ $${value1}`;
-                        case '<=':
-                          return `≤ $${value1}`;
-                        case '=':
-                          return `= $${value1}`;
-                        case 'between':
-                          return `$${value1} - $${value2}`;
-                        default:
-                          return 'Not specified';
-                      }
-                    })()}
+                    Dynamic Filters: {JSON.stringify(segment.filters)}
+                  </Typography>
+                )}
+                {segment.filteredAccounts && (
+                  <Typography>
+                    Filtered Accounts: {segment.filteredAccounts.length}
                   </Typography>
                 )}
                 {segment.triggers && Array.isArray(segment.triggers) && segment.triggers.length > 0 && (

@@ -5,7 +5,7 @@ import PayloadViewer from '../PayloadViewer';
 import { useAuth } from '../../context/AuthContext';
 import DynamicSegmentForm from './DynamicSegmentForm/index.tsx';
 
-const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
+const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], availableTables = [], currentSegmentId = null, initialData = null }) => {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     segmentName: initialData?.segmentName || '',
@@ -130,6 +130,7 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
             onSubmit={handleDynamicFilterSubmit}
             initialFilters={initialData?.filters}
             initialFilteredData={initialData?.filteredAccounts}
+            availableTables={availableTables.length === 1 && availableTables[0] === 'camp_mgmt' ? ['camp_mgmt'] : availableTables}
           />
         </Box>
 

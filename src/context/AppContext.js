@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { sampleCampaigns, sampleTriggers, sampleSegments, sampleOfferMappings } from '../utils/sampleData';
+import dataService from '../services/bigquery';
 
 const AppContext = createContext();
 
@@ -25,6 +25,16 @@ export const AppProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState(() => loadFromLocalStorage('campaigns', []));
   const [triggers, setTriggers] = useState(() => loadFromLocalStorage('triggers', []));
   const [segments, setSegments] = useState(() => loadFromLocalStorage('segments', []));
+  const [availableTables, setAvailableTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState('');
+  const [error, setError] = useState(null);
+
+  // Initialize with empty arrays if BigQuery fails
+  useEffect(() => {
+    if (!segments || !Array.isArray(segments)) {
+      setSegments([]);
+    }
+  }, [segments]);
   const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('offerMappings', []));
 
   useEffect(() => {
@@ -98,17 +108,60 @@ export const AppProvider = ({ children }) => {
     localStorage.removeItem('offerMappings');
   };
 
-  const loadSampleData = () => {
-    setCampaigns(sampleCampaigns);
-    setTriggers(sampleTriggers);
-    setSegments(sampleSegments);
-    setSegmentOfferMappings(sampleOfferMappings);
-    
-    // Save to localStorage
-    saveToLocalStorage('campaigns', sampleCampaigns);
-    saveToLocalStorage('triggers', sampleTriggers);
-    saveToLocalStorage('segments', sampleSegments);
-    saveToLocalStorage('offerMappings', sampleOfferMappings);
+  // Initialize BigQuery service and set up periodic data refresh
+  useEffect(() => {
+    const initializeBigQuery = async () => {
+      try {
+        const projectId = window._env_?.REACT_APP_BQ_PROJECT_ID || process.env.REACT_APP_BQ_PROJECT_ID;
+        const datasetId = window._env_?.REACT_APP_BQ_DATASET_ID || process.env.REACT_APP_BQ_DATASET_ID;
+        
+        if (!projectId || !datasetId) {
+          console.error('BigQuery project ID or dataset ID not found in environment variables');
+          return;
+        }
+
+        await dataService.initialize(projectId, datasetId);
+        console.log('BigQuery service initialized successfully');
+        
+        // Load available tables
+        const tables = await dataService.listTables();
+        if (tables.success) {
+          setAvailableTables(tables.data);
+        }
+      } catch (error) {
+        console.error('Failed to initialize BigQuery service:', error);
+      }
+    };
+
+    initializeBigQuery();
+  }, []);
+
+  const loadTableData = async (tableName) => {
+    try {
+      if (!tableName) {
+        setSegments([]);
+        return;
+      }
+
+      const result = await dataService.getTableData(tableName, 1000);
+      if (result.success) {
+        setSegments(result.data);
+        saveToLocalStorage('segments', result.data);
+      } else {
+        throw new Error(result.error || 'Failed to fetch table data');
+      }
+    } catch (error) {
+      console.error('Failed to load data from BigQuery:', error);
+      setError(error.message);
+      setSegments([]);
+      saveToLocalStorage('segments', []);
+    }
+  };
+
+  // Handle table selection
+  const handleTableSelect = async (tableName) => {
+    setSelectedTable(tableName);
+    await loadTableData(tableName);
   };
 
   return (
@@ -127,12 +180,15 @@ export const AppProvider = ({ children }) => {
       addSegmentOfferMapping,
       updateSegmentOfferMapping,
       clearAllData,
-      loadSampleData,
+      availableTables,
+      selectedTable,
+      handleTableSelect,
       // Add setter functions
       setCampaigns,
       setTriggers,
       setSegments,
-      setSegmentOfferMappings
+      setSegmentOfferMappings,
+      setError
     }}>
       {children}
     </AppContext.Provider>

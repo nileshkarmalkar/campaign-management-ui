@@ -23,7 +23,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ config, value, onChange
   if (!config.options) return null;
 
   const selectedValues = value || [];
-  const operator = config.operator || 'in';
+  const operator = config.operator || 'in' as ComparisonOperator;
 
   const handleChange = (event: SelectChangeEvent<string | string[]>) => {
     const newValue = event.target.value;
@@ -43,7 +43,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ config, value, onChange
     onChange(newValue, operator);
   };
 
-  const handleOperatorChange = (event: SelectChangeEvent<ComparisonOperator>) => {
+  const handleOperatorChange = (event: SelectChangeEvent<string>) => {
     const newOperator = event.target.value as ComparisonOperator;
     const newValue = newOperator === '=' ? (selectedValues.length > 0 ? [selectedValues[0]] : []) : selectedValues;
     onChange(newValue, newOperator);

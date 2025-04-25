@@ -12,10 +12,10 @@ interface DynamicSegmentFormProps {
   onSubmit: (filters: FilterState, filteredData: Record<string, any>[]) => void;
   initialFilters?: FilterState;
   initialFilteredData?: Record<string, any>[];
+  availableTables: string[];
 }
 
-const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initialFilters, initialFilteredData }) => {
-  const [tables, setTables] = useState<string[]>([]);
+const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initialFilters, initialFilteredData, availableTables }) => {
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [data, setData] = useState<Record<string, any>[]>([]);
   const [columns, setColumns] = useState<ColumnMetadata[]>([]);
@@ -27,30 +27,11 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTables = useCallback(async () => {
-    setError(null);
-    try {
-      const result = await dataService.listTables();
-      setTables(result);
-      if (result.length > 0 && !selectedTable) {
-        setSelectedTable(result[0]);
-      }
-    } catch (err) {
-      setError('Failed to fetch tables');
-      console.error(err);
+  useEffect(() => {
+    if (availableTables.length > 0 && !selectedTable) {
+      setSelectedTable(availableTables[0]);
     }
-  }, [selectedTable]);
-
-  // Initial fetch when component mounts
-  useEffect(() => {
-    fetchTables();
-  }, [fetchTables]);
-
-  // Poll for table updates every 30 seconds
-  useEffect(() => {
-    const intervalId = setInterval(fetchTables, 30000);
-    return () => clearInterval(intervalId);
-  }, [fetchTables]);
+  }, [availableTables, selectedTable]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,12 +39,21 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
       setIsLoading(true);
       setError(null);
       try {
-        await dataService.setCurrentTable(selectedTable);
-        const result = await dataService.getCustomerData(1000);
-        setData(result);
+        const result = await dataService.getTableData(selectedTable, 1000);
+        if (result.success) {
+          setData(result.data);
+          setError(null);
+        } else {
+          throw new Error(result.error || 'Failed to fetch data');
+        }
       } catch (err) {
-        setError('Failed to fetch data');
-        console.error(err);
+        console.error('Error fetching data:', err);
+        if (selectedTable === 'camp_mgmt') {
+          // If using sample data table, don't show error
+          setError(null);
+        } else {
+          setError('Failed to fetch data. Please try again.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -276,7 +266,7 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
             onChange={(e) => setSelectedTable(e.target.value)}
             label="Table"
           >
-            {tables.map((table) => (
+            {availableTables.map((table) => (
               <MenuItem key={table} value={table}>{table}</MenuItem>
             ))}
           </Select>

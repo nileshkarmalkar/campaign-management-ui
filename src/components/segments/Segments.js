@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton } from '@mui/material';
+import dataService from '../../services/bigquery';
+import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import SegmentForm from './SegmentForm';
@@ -11,6 +12,30 @@ const Segments = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('segmentName');
   const [selectedSegment, setSelectedSegment] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [availableTables, setAvailableTables] = useState([]);
+  const [error, setError] = useState(null);
+
+  const fetchTables = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const result = await dataService.listTables();
+      console.log('Fetched tables:', result);
+      if (result && result.length > 0) {
+        setAvailableTables(result);
+      } else {
+        console.log('No tables found, using sample data');
+        setAvailableTables(['camp_mgmt']);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tables:', error);
+      console.log('Falling back to sample data');
+      setAvailableTables(['camp_mgmt']);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredSegments = useMemo(() => {
     return segments.filter(segment => {
@@ -28,8 +53,9 @@ const Segments = () => {
     setSearchTerm('');
   };
 
-  const handleAddSegment = () => {
+  const handleAddSegment = async () => {
     setSelectedSegment(null);
+    await fetchTables();
     setShowForm(true);
   };
 
@@ -108,24 +134,39 @@ const Segments = () => {
             variant="contained"
             color="primary"
             onClick={handleAddSegment}
+            disabled={isLoading}
           >
-            Create Segment
+            {isLoading ? 'Loading...' : 'Create Segment'}
           </Button>
+          {error && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
         </Box>
       )}
       {showForm && (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
-          <SegmentForm 
-            onSubmit={handleSubmitForm} 
-            onCancel={handleCancelForm}
-            availableTriggers={triggers}
-            availableSegments={segments}
-            currentSegmentId={selectedSegment?.id}
-            initialData={selectedSegment}
-          />
+          {availableTables.length > 0 ? (
+            <SegmentForm 
+              onSubmit={handleSubmitForm} 
+              onCancel={handleCancelForm}
+              availableTriggers={triggers}
+              availableSegments={segments}
+              availableTables={availableTables}
+              currentSegmentId={selectedSegment?.id}
+              initialData={selectedSegment}
+            />
+          ) : (
+            <Typography>No tables available. Please check your BigQuery configuration.</Typography>
+          )}
         </Paper>
       )}
-      {!showForm && (
+      {isLoading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+          <CircularProgress />
+        </Box>
+      ) : !showForm ? (
         <Grid container spacing={3}>
           {filteredSegments.map((segment) => (
             <Grid item xs={12} key={segment.id}>
@@ -136,11 +177,11 @@ const Segments = () => {
                     <EditIcon />
                   </IconButton>
                 </Box>
-                <Typography>Description: {segment.description}</Typography>
+                <Typography>Description: {segment.description || 'No description available'}</Typography>
                 <Typography style={{ color: getStatusColor(segment.status) }}>
-                  Status: {segment.status}
+                  Status: {segment.status || 'Unknown'}
                 </Typography>
-                {segment.filters && segment.filters.root.conditions.length > 0 && (
+                {segment.filters && segment.filters.root && segment.filters.root.conditions && segment.filters.root.conditions.length > 0 && (
                   <Paper variant="outlined" sx={{ mt: 2, p: 2, bgcolor: 'background.default' }}>
                     <Typography variant="subtitle2" sx={{ mb: 1, color: 'primary.main' }}>
                       Filter Conditions
@@ -212,22 +253,14 @@ const Segments = () => {
                 )}
                 {segment.triggers && Array.isArray(segment.triggers) && segment.triggers.length > 0 && (
                   <Typography>
-                    Triggers: {segment.triggers.map(t => {
-                      const trigger = triggers.find(trigger => trigger.id === t);
-                      return trigger ? `${trigger.triggerName} (${trigger.type})` : '';
-                    }).filter(Boolean).join(', ')}
-                  </Typography>
-                )}
-                {segment.existingSegments && Array.isArray(segment.existingSegments) && segment.existingSegments.length > 0 && (
-                  <Typography>
-                    Existing Segments: {segment.existingSegments.map(s => segments.find(seg => seg.id === s)?.segmentName).filter(Boolean).join(', ')}
+                    Triggers: {segment.triggers.join(', ')}
                   </Typography>
                 )}
               </Paper>
             </Grid>
           ))}
         </Grid>
-      )}
+      ) : null}
     </div>
   );
 };

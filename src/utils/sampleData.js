@@ -238,29 +238,21 @@ export const sampleOfferMappings = [
     id: 'map_001',
     segmentId: 'seg_001',
     segmentName: 'High-Value Mobility Customers',
-    offers: [
-      {
-        id: 'TC-BRP-Q12025-ROC-TIER1',
-        name: 'TC-BRP-Q12025-ROC-TIER1',
-        startDate: '2025-04-01T04:00:00.000Z',
-        endDate: null,
-        status: 'Created'
-      }
-    ]
+    offerId: 'TC-BRP-Q12025-ROC-TIER1',
+    offerName: 'TC-BRP-Q12025-ROC-TIER1',
+    startDate: '2025-04-01T04:00:00.000Z',
+    endDate: null,
+    status: 'Created'
   },
   {
     id: 'map_002',
     segmentId: 'seg_002',
     segmentName: 'Internet-Only Customers',
-    offers: [
-      {
-        id: 'TC-BRP-Q13788-BC-TIER1',
-        name: 'TC-BRP-Q13788-BC-TIER1',
-        startDate: '2025-02-01T05:00:00.000Z',
-        endDate: null,
-        status: 'Created'
-      }
-    ]
+    offerId: 'TC-BRP-Q13788-BC-TIER1',
+    offerName: 'TC-BRP-Q13788-BC-TIER1',
+    startDate: '2025-02-01T05:00:00.000Z',
+    endDate: null,
+    status: 'Created'
   }
 ];
 

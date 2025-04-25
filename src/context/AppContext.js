@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { sampleCampaigns, sampleTriggers, sampleSegments, sampleOfferMappings } from '../utils/sampleData';
 
 const AppContext = createContext();
 
@@ -97,6 +98,13 @@ export const AppProvider = ({ children }) => {
     localStorage.removeItem('offerMappings');
   };
 
+  const loadSampleData = () => {
+    setCampaigns(sampleCampaigns);
+    setTriggers(sampleTriggers);
+    setSegments(sampleSegments);
+    setSegmentOfferMappings(sampleOfferMappings);
+  };
+
   return (
     <AppContext.Provider value={{ 
       campaigns, 
@@ -113,6 +121,7 @@ export const AppProvider = ({ children }) => {
       addSegmentOfferMapping,
       updateSegmentOfferMapping,
       clearAllData,
+      loadSampleData,
       // Add setter functions
       setCampaigns,
       setTriggers,

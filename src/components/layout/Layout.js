@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { 
   Box, 
   AppBar, 
@@ -15,7 +16,8 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-  SvgIcon
+  SvgIcon,
+  Alert
 } from '@mui/material';
 import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
@@ -39,8 +41,8 @@ const TelusLogo = (props) => (
   </SvgIcon>
 );
 
-const Layout = ({ children }) => {
-  const { clearAllData } = useAppContext();
+const Layout = () => {
+  const { clearAllData, error, isBigQueryInitialized } = useAppContext();
   const { currentUser, checkPermission } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -109,7 +111,17 @@ const Layout = ({ children }) => {
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3, bgcolor: '#FFFFFF' }}>
         <Toolbar />
-        {children}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {!isBigQueryInitialized && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            BigQuery is initializing. Some features may be temporarily unavailable.
+          </Alert>
+        )}
+        <Outlet />
       </Box>
       <Dialog
         open={openDialog}

@@ -1,185 +1,46 @@
 import React from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline, Button, Box } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
-import { AppProvider, useAppContext, loadFromLocalStorage } from './context/AppContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { loadSampleData } from './utils/sampleData';
 import Layout from './components/layout/Layout';
-import Login from './components/auth/Login';
-import ProtectedRoutes from './components/auth/ProtectedRoutes';
 import Campaigns from './components/campaigns/Campaigns';
 import Segments from './components/segments/Segments';
+import Offers from './components/offers/Offers';
 import Communications from './components/communications/Communications';
 import Triggers from './components/triggers/Triggers';
 import SegmentOfferMapping from './components/segment-offer-mapping/SegmentOfferMapping';
 import CampaignWorkflow from './components/workflow/CampaignWorkflow';
+import Login from './components/auth/Login';
+import ProtectedRoutes from './components/auth/ProtectedRoutes';
+import { AuthProvider } from './context/AuthContext';
+import { AppProvider } from './context/AppContext';
 import './App.css';
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#4B286D', // TELUS purple
-      light: '#7C5AA6',
-      dark: '#2A1347',
-      contrastText: '#FFFFFF'
-    },
-    secondary: {
-      main: '#2B8000', // TELUS green
-      light: '#66B100',
-      dark: '#1F5C00',
-      contrastText: '#FFFFFF'
-    },
-    background: {
-      default: '#FFFFFF',
-      paper: '#F7F7F8'
-    },
-    text: {
-      primary: '#2A2C2E',
-      secondary: '#4B286D'
-    }
-  },
-  typography: {
-    fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    h1: {
-      fontSize: '2.75rem',
-      fontWeight: 300,
-      color: '#4B286D'
-    },
-    h2: {
-      fontSize: '2rem',
-      fontWeight: 400,
-      color: '#4B286D'
-    },
-    h3: {
-      fontSize: '1.75rem',
-      fontWeight: 400,
-      color: '#2A2C2E'
-    },
-    h4: {
-      fontSize: '1.5rem',
-      fontWeight: 400,
-      color: '#2A2C2E'
-    },
-    h5: {
-      fontSize: '1.25rem',
-      fontWeight: 400,
-      color: '#2A2C2E'
-    },
-    h6: {
-      fontSize: '1.125rem',
-      fontWeight: 500,
-      color: '#2A2C2E'
-    }
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: '4px',
-          textTransform: 'none',
-          fontWeight: 500,
-          padding: '8px 20px'
-        },
-        contained: {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: 'none'
-          }
-        }
-      }
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: '8px'
-        }
-      }
-    }
-  }
-});
-
-const AppContent = () => {
-  const { 
-    setCampaigns, 
-    setTriggers, 
-    setSegments, 
-    setSegmentOfferMappings 
-  } = useAppContext();
-  
-  const handleLoadSampleData = () => {
-    loadSampleData(); // This will save to localStorage
-    // Force a reload of the data from localStorage
-    setCampaigns(loadFromLocalStorage('campaigns', []));
-    setTriggers(loadFromLocalStorage('triggers', []));
-    setSegments(loadFromLocalStorage('segments', []));
-    setSegmentOfferMappings(loadFromLocalStorage('offerMappings', []));
-  };
-
-  const { logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-  };
-
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} dateLibInstance={dayjs}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <HashRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/*"
-              element={
-                <ProtectedRoutes>
-                  <Layout>
-                    <Box sx={{ position: 'fixed', top: 80, right: 20, zIndex: 9999 }}>
-                      <Button 
-                        onClick={handleLoadSampleData} 
-                        variant="contained" 
-                        color="primary"
-                        sx={{ mr: 2 }}
-                      >
-                        Load Sample Data
-                      </Button>
-                      <Button 
-                        onClick={handleLogout} 
-                        variant="outlined" 
-                        color="primary"
-                      >
-                        Logout
-                      </Button>
-                    </Box>
-                    <Routes>
-                      <Route path="/campaigns" element={<Campaigns />} />
-                      <Route path="/segments" element={<Segments />} />
-                      <Route path="/communications" element={<Communications />} />
-                      <Route path="/triggers" element={<Triggers />} />
-                      <Route path="/segment-offer-mapping" element={<SegmentOfferMapping />} />
-                      <Route path="/workflow" element={<CampaignWorkflow />} />
-                      <Route path="/" element={<Navigate to="/workflow" replace />} />
-                    </Routes>
-                  </Layout>
-                </ProtectedRoutes>
-              }
-            />
-          </Routes>
-        </HashRouter>
-      </ThemeProvider>
-    </LocalizationProvider>
-  );
-};
 
 function App() {
   return (
-    <AuthProvider>
-      <AppProvider>
-        <AppContent />
-      </AppProvider>
-    </AuthProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <AuthProvider>
+        <AppProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<ProtectedRoutes />}>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Navigate to="/segments" replace />} />
+                  <Route path="segments" element={<Segments />} />
+                  <Route path="campaigns" element={<Campaigns />} />
+                  <Route path="offers" element={<Offers />} />
+                  <Route path="communications" element={<Communications />} />
+                  <Route path="triggers" element={<Triggers />} />
+                  <Route path="segment-offer-mapping" element={<SegmentOfferMapping />} />
+                  <Route path="workflow" element={<CampaignWorkflow />} />
+                </Route>
+              </Route>
+            </Routes>
+          </Router>
+        </AppProvider>
+      </AuthProvider>
+    </LocalizationProvider>
   );
 }
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-const ProtectedRoutes = ({ children }) => {
+const ProtectedRoutes = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
@@ -11,7 +11,8 @@ const ProtectedRoutes = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return children;
+  // Render child routes using Outlet
+  return <Outlet />;
 };
 
 export default ProtectedRoutes;

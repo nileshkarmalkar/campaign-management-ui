@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+<<<<<<< Updated upstream
 import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment, Typography, Box } from '@mui/material';
 import { generatePayload, logPayload } from '../../utils/payloadGenerator';
 import PayloadViewer from '../PayloadViewer';
@@ -27,6 +28,30 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
       existingSegments: []
     }
   );
+=======
+import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Typography, Box, CircularProgress } from '@mui/material';
+import { generatePayload, logPayload } from '../../utils/payloadGenerator';
+import PayloadViewer from '../PayloadViewer';
+import { useAuth } from '../../context/AuthContext';
+import { useAppContext } from '../../context/AppContext';
+import DynamicSegmentForm from './DynamicSegmentForm/index.tsx';
+
+const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegments = [], currentSegmentId = null, initialData = null }) => {
+  const { currentUser } = useAuth();
+  const { addSegment, updateSegment } = useAppContext();
+  const [formData, setFormData] = useState({
+    segmentName: initialData?.segmentName || '',
+    description: initialData?.description || '',
+    status: initialData?.status || 'active',
+    triggers: initialData?.triggers || [],
+    existingSegments: initialData?.existingSegments || []
+  });
+  const [generatedPayload, setGeneratedPayload] = useState(null);
+  const [dynamicFilters, setDynamicFilters] = useState(null);
+  const [filteredData, setFilteredData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+>>>>>>> Stashed changes
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -43,19 +68,66 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
 
   const [generatedPayload, setGeneratedPayload] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+<<<<<<< Updated upstream
     const payload = generatePayload('segment', formData, currentUser);
     logPayload(payload);
     setGeneratedPayload(payload);
     onSubmit(formData);
+=======
+    setIsLoading(true);
+    setError(null);
+
+    const segmentData = {
+      ...formData,
+      filters: dynamicFilters,
+      filteredAccounts: filteredData?.map(d => d.accountId) || []
+    };
+    
+    const payload = generatePayload('segment', segmentData, currentUser);
+    logPayload(payload);
+    setGeneratedPayload(payload);
+
+    try {
+      if (initialData) {
+        await updateSegment({ ...segmentData, id: currentSegmentId });
+      } else {
+        await addSegment(segmentData);
+      }
+      onSubmit(segmentData);
+    } catch (err) {
+      console.error('Error saving segment:', err);
+      setError('Failed to save segment. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+>>>>>>> Stashed changes
   };
+
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <>
       <Typography variant="h5" gutterBottom>
         {initialData ? 'Edit Segment' : 'Create New Segment'}
       </Typography>
+<<<<<<< Updated upstream
+=======
+
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
+>>>>>>> Stashed changes
       <form onSubmit={handleSubmit}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -242,6 +314,7 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
             )}
           </Grid>
         </Grid>
+<<<<<<< Updated upstream
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
             <InputLabel>Triggers</InputLabel>
@@ -303,6 +376,30 @@ const SegmentForm = ({ onSubmit, onCancel, availableTriggers = [], availableSegm
             {initialData ? 'Update' : 'Submit'}
           </Button>
           <Button onClick={onCancel} variant="outlined" style={{ marginLeft: '10px' }}>
+=======
+
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Filter Configuration
+          </Typography>
+          <DynamicSegmentForm
+            onSubmit={handleDynamicFilterSubmit}
+            initialFilters={initialData?.filters}
+            initialFilteredData={initialData?.filteredAccounts}
+          />
+        </Box>
+
+        <Box sx={{ mt: 2 }}>
+          <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
+            {initialData ? 'Update' : 'Create Segment'}
+          </Button>
+          <Button 
+            onClick={onCancel} 
+            variant="outlined" 
+            sx={{ ml: 2 }}
+            disabled={isLoading}
+          >
+>>>>>>> Stashed changes
             Cancel
           </Button>
         </Grid>

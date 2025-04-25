@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import dataService from '../services/bigquery';
 
 const AppContext = createContext();
 
@@ -25,6 +26,33 @@ export const AppProvider = ({ children }) => {
   const [triggers, setTriggers] = useState(() => loadFromLocalStorage('triggers', []));
   const [segments, setSegments] = useState(() => loadFromLocalStorage('segments', []));
   const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('offerMappings', []));
+  const [customerData, setCustomerData] = useState([]);
+  const [isBigQueryInitialized, setIsBigQueryInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const initializeBigQuery = async () => {
+      try {
+        // Initialize BigQuery
+        await dataService.initialize('aipp-tmf680-orch-dev-a613e8', 'camp_mgmt');
+        
+        // Set the current table
+        await dataService.setCurrentTable('customer_data');
+        
+        // Fetch initial customer data
+        const data = await dataService.getCustomerData();
+        setCustomerData(data);
+        
+        setIsBigQueryInitialized(true);
+      } catch (err) {
+        console.error('Error initializing BigQuery:', err);
+        setError('Failed to initialize BigQuery. Some features may not work properly.');
+      }
+    };
+
+    initializeBigQuery();
+  }, []);
 
   useEffect(() => {
     saveToLocalStorage('campaigns', campaigns);
@@ -62,14 +90,94 @@ export const AppProvider = ({ children }) => {
     ));
   };
 
-  const addSegment = (segment) => {
-    setSegments([...segments, { ...segment, id: Date.now() }]);
+  const addSegment = async (segment) => {
+    if (!isBigQueryInitialized) {
+      throw new Error('BigQuery is not initialized. Please try again later.');
+    }
+    setIsLoading(true);
+    try {
+      let filteredAccounts = [];
+      if (segment.filters && segment.filters.root.conditions.length > 0) {
+        const query = buildBigQueryFilter(segment.filters);
+        const result = await dataService.executeQuery(query);
+        filteredAccounts = result;
+      }
+
+      const newSegment = {
+        ...segment,
+        id: Date.now(),
+        filteredAccounts
+      };
+
+      setSegments([...segments, newSegment]);
+      return newSegment;
+    } catch (error) {
+      console.error('Error creating segment:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateSegment = (updatedSegment) => {
-    setSegments(segments.map(segment =>
-      segment.id === updatedSegment.id ? updatedSegment : segment
-    ));
+  const updateSegment = async (updatedSegment) => {
+    if (!isBigQueryInitialized) {
+      throw new Error('BigQuery is not initialized. Please try again later.');
+    }
+    setIsLoading(true);
+    try {
+      if (updatedSegment.filters && updatedSegment.filters.root.conditions.length > 0) {
+        const query = buildBigQueryFilter(updatedSegment.filters);
+        const result = await dataService.executeQuery(query);
+        updatedSegment.filteredAccounts = result;
+      }
+
+      setSegments(segments.map(segment =>
+        segment.id === updatedSegment.id ? updatedSegment : segment
+      ));
+    } catch (error) {
+      console.error('Error updating segment:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const buildBigQueryFilter = (filters) => {
+    const conditions = filters.root.conditions.map(condition => {
+      const { field, operator, value } = condition;
+      switch (operator) {
+        case '=':
+          return `${field} = '${value}'`;
+        case '!=':
+          return `${field} != '${value}'`;
+        case '>':
+          return `${field} > ${value}`;
+        case '>=':
+          return `${field} >= ${value}`;
+        case '<':
+          return `${field} < ${value}`;
+        case '<=':
+          return `${field} <= ${value}`;
+        case 'between':
+          return `${field} BETWEEN ${value[0]} AND ${value[1]}`;
+        case 'contains':
+          return `CONTAINS(${field}, '${value}')`;
+        case 'not_contains':
+          return `NOT CONTAINS(${field}, '${value}')`;
+        case 'in':
+          return `${field} IN (${value.map(v => `'${v}'`).join(', ')})`;
+        case 'not_in':
+          return `${field} NOT IN (${value.map(v => `'${v}'`).join(', ')})`;
+        default:
+          return '';
+      }
+    }).filter(Boolean);
+
+    const whereClause = conditions.join(
+      filters.root.operator === 'AND' ? ' AND ' : ' OR '
+    );
+
+    return `SELECT * FROM \`aipp-tmf680-orch-dev-a613e8.camp_mgmt.customer_data\` WHERE ${whereClause}`;
   };
 
   const getSegmentById = (id) => {
@@ -102,6 +210,10 @@ export const AppProvider = ({ children }) => {
       campaigns, 
       triggers, 
       segments,
+      customerData,
+      isBigQueryInitialized,
+      isLoading,
+      error,
       addCampaign, 
       updateCampaign, 
       addTrigger,
@@ -113,7 +225,6 @@ export const AppProvider = ({ children }) => {
       addSegmentOfferMapping,
       updateSegmentOfferMapping,
       clearAllData,
-      // Add setter functions
       setCampaigns,
       setTriggers,
       setSegments,

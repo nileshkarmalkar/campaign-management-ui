@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton } from '@mui/material';
+import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton, Alert } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import SegmentForm from './SegmentForm';
 
 const Segments = () => {
   const [showForm, setShowForm] = useState(false);
-  const { segments, addSegment, updateSegment, triggers } = useAppContext();
+  const { segments, addSegment, updateSegment, triggers, isBigQueryInitialized, isLoading } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('segmentName');
   const [showEditForm, setShowEditForm] = useState(false);
@@ -37,6 +37,7 @@ const Segments = () => {
     setShowForm(false);
   };
 
+<<<<<<< Updated upstream
   const handleSubmitForm = (formData) => {
     if (selectedSegment) {
       updateSegment({ ...formData, id: selectedSegment.id });
@@ -45,6 +46,20 @@ const Segments = () => {
     } else {
       addSegment(formData);
       setShowForm(false);
+=======
+  const handleSubmitForm = async (formData) => {
+    try {
+      if (selectedSegment) {
+        await updateSegment({ ...formData, id: selectedSegment.id });
+      } else {
+        await addSegment(formData);
+      }
+      setShowForm(false);
+      setSelectedSegment(null);
+    } catch (error) {
+      console.error('Error saving segment:', error);
+      // Error handling is done in SegmentForm
+>>>>>>> Stashed changes
     }
   };
 
@@ -76,6 +91,13 @@ const Segments = () => {
       <Typography variant="h4" gutterBottom>
         Segments
       </Typography>
+
+      {!isBigQueryInitialized && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          BigQuery integration is initializing. Some features may be temporarily unavailable.
+        </Alert>
+      )}
+
       <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'flex-end' }}>
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>Search By</InputLabel>
@@ -105,6 +127,7 @@ const Segments = () => {
         />
       </Box>
       {!showForm && (
+<<<<<<< Updated upstream
         <Button
           variant="contained"
           color="primary"
@@ -113,6 +136,18 @@ const Segments = () => {
         >
           Add New Segment
         </Button>
+=======
+        <Box sx={{ mb: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddSegment}
+            disabled={isLoading}
+          >
+            Create Segment
+          </Button>
+        </Box>
+>>>>>>> Stashed changes
       )}
       {showForm || showEditForm ? (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
@@ -132,7 +167,7 @@ const Segments = () => {
               <Paper style={{ padding: '20px' }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Typography variant="h6">{segment.segmentName}</Typography>
-                  <IconButton onClick={() => handleEditSegment(segment)} color="primary">
+                  <IconButton onClick={() => handleEditSegment(segment)} color="primary" disabled={isLoading}>
                     <EditIcon />
                   </IconButton>
                 </Box>

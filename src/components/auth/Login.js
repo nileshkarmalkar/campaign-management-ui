@@ -21,7 +21,7 @@ const Login = () => {
     e.preventDefault();
     const success = login(email.toLowerCase());
     if (success) {
-      const from = location.state?.from?.pathname || '/workflow';
+      const from = location.state?.from?.pathname || '/segments';
       navigate(from, { replace: true });
     }
   };

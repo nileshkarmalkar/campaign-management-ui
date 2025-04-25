@@ -4,9 +4,8 @@ import { ThemeProvider, createTheme, CssBaseline, Button, Box } from '@mui/mater
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { AppProvider, useAppContext, loadFromLocalStorage } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { loadSampleData } from './utils/sampleData';
 import Layout from './components/layout/Layout';
 import Login from './components/auth/Login';
 import ProtectedRoutes from './components/auth/ProtectedRoutes';

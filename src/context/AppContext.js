@@ -103,6 +103,12 @@ export const AppProvider = ({ children }) => {
     setTriggers(sampleTriggers);
     setSegments(sampleSegments);
     setSegmentOfferMappings(sampleOfferMappings);
+    
+    // Save to localStorage
+    saveToLocalStorage('campaigns', sampleCampaigns);
+    saveToLocalStorage('triggers', sampleTriggers);
+    saveToLocalStorage('segments', sampleSegments);
+    saveToLocalStorage('offerMappings', sampleOfferMappings);
   };
 
   return (

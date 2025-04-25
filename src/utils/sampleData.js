@@ -109,33 +109,57 @@ export const sampleSegments = [
 export const sampleTriggers = [
   {
     id: 'trig_001',
-    triggerName: 'Device Age Trigger',
+    triggerName: 'VULNERABLE_TRIGGER_EVENTS',
     type: 'event',
-    conditions: [{
-      field: 'deviceAge',
-      operator: '>',
-      value: '18'
-    }],
+    conditions: [
+      {
+        field: 'triggerName',
+        operator: '=',
+        value: 'TELUS>SUPPORT>ARTICLE>TELUS_DEVICE_CHECKUP_APP'
+      },
+      {
+        field: 'triggerName',
+        operator: '=',
+        value: 'TELUS>SUPPORT>ARTICLE>TELUS_MOBILITY_RATE_PLANS_AND_ELIGIBILITY'
+      },
+      {
+        field: 'triggerName',
+        operator: '=',
+        value: 'TELUS>SUPPORT>ARTICLE>SERVICE_TERMS_BETWEEN_YOU_AND_TELUS'
+      }
+    ],
     frequency: 'One-time',
     segmentId: 'seg_001',
     campaignId: 'camp_001',
     status: 'active',
-    description: 'Triggers when device age exceeds 18 months'
+    description: 'List of VULNERABLE_TRIGGER_EVENTS'
   },
   {
     id: 'trig_002',
-    triggerName: 'Usage Pattern Trigger',
+    triggerName: 'ULTRA_HOT_TRIGGER',
     type: 'event',
-    conditions: [{
-      field: 'dataUsage',
-      operator: '>',
-      value: '80'
-    }],
-    frequency: 'Monthly',
+    conditions: [
+      {
+        field: 'triggerName',
+        operator: '=',
+        value: 'TELUS>SUPPORT>ARTICLE>UNLINK_A_MOBILITY_ACCOUNT'
+      },
+      {
+        field: 'triggerName',
+        operator: '=',
+        value: 'TELUS>SUPPORT>ARTICLE>CANCELLING_TELUS'
+      },
+      {
+        field: 'triggerName',
+        operator: '=',
+        value: 'TELUS>BUSINESS>SUPPORT>ARTICLE>CANCEL_ACCOUNT_OR_SERVICE'
+      }
+    ],
+    frequency: 'One-time',
     segmentId: 'seg_002',
     campaignId: 'camp_002',
     status: 'active',
-    description: 'Triggers when data usage exceeds 80% for 3 consecutive months'
+    description: 'List of ULTRA_HOT_TRIGGER events'
   }
 ];
 
@@ -213,57 +237,28 @@ export const sampleOfferMappings = [
   {
     id: 'map_001',
     segmentId: 'seg_001',
+    segmentName: 'High-Value Mobility Customers',
     offers: [
       {
-        id: 'off_001',
-        name: 'Premium Device Upgrade',
-        description: '$300 off on premium devices with 2-year term',
-        details: {
-          discount: 300,
-          term: 24,
-          deviceTypes: ['iPhone', 'Samsung Galaxy', 'Google Pixel'],
-          planRequirement: 'Peace of Mind Connect'
-        },
-        validFrom: '2025-06-01',
-        validTo: '2025-08-31',
-        status: 'Created',
-        terms: [
-          'Minimum $80/month plan required',
-          'Credit check required',
-          'Early cancellation fees apply',
-          'Cannot be combined with other offers'
-        ]
+        id: 'TC-BRP-Q12025-ROC-TIER1',
+        name: 'TC-BRP-Q12025-ROC-TIER1',
+        startDate: '2025-04-01T04:00:00.000Z',
+        endDate: null,
+        status: 'Created'
       }
     ]
   },
   {
     id: 'map_002',
     segmentId: 'seg_002',
+    segmentName: 'Internet-Only Customers',
     offers: [
       {
-        id: 'off_002',
-        name: 'Internet Speed Upgrade',
-        description: 'Upgrade to 1.5Gbps Internet for $99/month',
-        details: {
-          speed: '1.5 Gbps',
-          regularPrice: 120,
-          promoPrice: 99,
-          promoDuration: 12,
-          extras: [
-            'Unlimited data',
-            'Wi-Fi 6 modem rental',
-            '3 months free streaming'
-          ]
-        },
-        validFrom: '2025-07-01',
-        validTo: '2025-09-30',
-        status: 'Created',
-        terms: [
-          '12-month term required',
-          'Available where technology permits',
-          'Price increases after promotional period',
-          'Installation fees may apply'
-        ]
+        id: 'TC-BRP-Q13788-BC-TIER1',
+        name: 'TC-BRP-Q13788-BC-TIER1',
+        startDate: '2025-02-01T05:00:00.000Z',
+        endDate: null,
+        status: 'Created'
       }
     ]
   }

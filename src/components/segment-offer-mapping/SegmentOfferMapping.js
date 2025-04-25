@@ -25,6 +25,8 @@ const SegmentOfferMapping = () => {
   const [searchField, setSearchField] = useState('segmentName');
   const [showForm, setShowForm] = useState(false);
 
+  console.log('segmentOfferMappings:', segmentOfferMappings);
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -55,10 +57,12 @@ const SegmentOfferMapping = () => {
   };
 
   const filteredMappings = useMemo(() => {
-    return (segmentOfferMappings || []).filter(mapping => {
+    const filtered = (segmentOfferMappings || []).filter(mapping => {
       const searchValue = mapping[searchField]?.toString().toLowerCase() || '';
       return searchValue.includes(searchTerm.toLowerCase());
     });
+    console.log('filteredMappings:', filtered);
+    return filtered;
   }, [segmentOfferMappings, searchTerm, searchField]);
 
   return (

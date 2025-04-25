@@ -102,22 +102,6 @@ const theme = createTheme({
 });
 
 const AppContent = () => {
-  const { 
-    setCampaigns, 
-    setTriggers, 
-    setSegments, 
-    setSegmentOfferMappings 
-  } = useAppContext();
-  
-  const handleLoadSampleData = () => {
-    loadSampleData(); // This will save to localStorage
-    // Force a reload of the data from localStorage
-    setCampaigns(loadFromLocalStorage('campaigns', []));
-    setTriggers(loadFromLocalStorage('triggers', []));
-    setSegments(loadFromLocalStorage('segments', []));
-    setSegmentOfferMappings(loadFromLocalStorage('offerMappings', []));
-  };
-
   const { logout } = useAuth();
 
   const handleLogout = () => {
@@ -137,14 +121,6 @@ const AppContent = () => {
                 <ProtectedRoutes>
                   <Layout>
                     <Box sx={{ position: 'fixed', top: 80, right: 20, zIndex: 9999 }}>
-                      <Button 
-                        onClick={handleLoadSampleData} 
-                        variant="contained" 
-                        color="primary"
-                        sx={{ mr: 2 }}
-                      >
-                        Load Sample Data
-                      </Button>
                       <Button 
                         onClick={handleLogout} 
                         variant="outlined" 

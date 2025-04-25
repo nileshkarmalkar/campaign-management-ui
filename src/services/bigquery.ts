@@ -3,10 +3,15 @@ import { sampleDatasets } from '../utils/sampleData';
 class DataService {
   private projectId: string = '';
   private dataset: string = '';
+  private currentTable: string = '';
 
   async initialize(projectId: string, dataset: string): Promise<void> {
     this.projectId = projectId;
     this.dataset = dataset;
+  }
+
+  async setCurrentTable(table: string): Promise<void> {
+    this.currentTable = table;
   }
 
   async listTables(): Promise<string[]> {
@@ -14,10 +19,10 @@ class DataService {
     return ['customer_data', 'churn_model_data'];
   }
 
-  async getCustomerData(): Promise<any[]> {
+  async getCustomerData(limit: number = 1000): Promise<any[]> {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
-    return sampleDatasets.customerData;
+    return sampleDatasets.customerData.slice(0, limit);
   }
 
   async getChurnData(): Promise<any[]> {
@@ -32,4 +37,5 @@ class DataService {
   }
 }
 
-export default DataService;
+const dataService = new DataService();
+export default dataService;

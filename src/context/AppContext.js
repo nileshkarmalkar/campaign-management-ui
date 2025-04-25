@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import dataService from '../services/bigquery';
+import dataService from '../services/bigquery.ts';
 
 const AppContext = createContext();
 

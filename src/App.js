@@ -21,7 +21,7 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AuthProvider>
         <AppProvider>
-          <Router>
+          <Router basename="/campaign-management-ui/dynamic-segmentation">
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route element={<ProtectedRoutes />}>

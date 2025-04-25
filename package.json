@@ -1,9 +1,8 @@
 {
   "name": "campaign-management-ui",
-  "homepage": "https://nileshkarmalkar.github.io/campaign-management-ui",
+  "homepage": "https://nileshkarmalkar.github.io/campaign-management-ui/dynamic-segmentation",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://nileshkarmalkar.github.io/campaign-management-ui",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",

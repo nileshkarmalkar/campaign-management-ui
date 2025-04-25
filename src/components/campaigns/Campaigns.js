@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 
 const Campaigns = () => {
   const [showForm, setShowForm] = useState(false);
-  const { campaigns, addCampaign, updateCampaign, loadSampleData, clearAllData } = useAppContext();
+  const { campaigns, addCampaign, updateCampaign } = useAppContext();
   const { checkPermission } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('campaignName');
@@ -98,29 +98,14 @@ const Campaigns = () => {
         />
       </Box>
       {!showForm && canWrite && (
-        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddCampaign}
-          >
-            Add New Campaign
-          </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={loadSampleData}
-          >
-            Load Sample Data
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={clearAllData}
-          >
-            Clear All Data
-          </Button>
-        </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddCampaign}
+          sx={{ mb: 3 }}
+        >
+          Add New Campaign
+        </Button>
       )}
       {showForm || showEditForm ? (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>

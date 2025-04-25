@@ -17,7 +17,7 @@ import {
   DialogContentText,
   SvgIcon
 } from '@mui/material';
-import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline } from '@mui/icons-material';
+import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline, CloudDownload } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -40,7 +40,7 @@ const TelusLogo = (props) => (
 );
 
 const Layout = ({ children }) => {
-  const { clearAllData } = useAppContext();
+  const { clearAllData, loadSampleData } = useAppContext();
   const { currentUser, checkPermission } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -57,6 +57,10 @@ const Layout = ({ children }) => {
     setOpenDialog(false);
   };
 
+  const handleLoadSampleData = () => {
+    loadSampleData();
+  };
+
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, bgcolor: '#FFFFFF' }}>
@@ -69,15 +73,26 @@ const Layout = ({ children }) => {
             {currentUser?.name} ({currentUser?.role})
           </Typography>
           {checkPermission('modify') && (
-            <Button
-              color="secondary"
-              startIcon={<DeleteOutline />}
-              onClick={handleClearData}
-              variant="contained"
-              sx={{ ml: 2 }}
-            >
-              Clear All Data
-            </Button>
+            <>
+              <Button
+                color="primary"
+                startIcon={<CloudDownload />}
+                onClick={handleLoadSampleData}
+                variant="contained"
+                sx={{ ml: 2 }}
+              >
+                Load Sample Data
+              </Button>
+              <Button
+                color="secondary"
+                startIcon={<DeleteOutline />}
+                onClick={handleClearData}
+                variant="contained"
+                sx={{ ml: 2 }}
+              >
+                Clear All Data
+              </Button>
+            </>
           )}
         </Toolbar>
       </AppBar>

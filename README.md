@@ -25,6 +25,7 @@ A React-based web application for managing marketing campaigns, segments, trigge
 
 ### 2. Segment Management
 - Create and manage customer segments
+- Dynamic segmentation with real-time data visualization
 - Define segment criteria:
   - Brand selection (TELUS, Koodo)
   - Line of Business (Mobility, Home Solution, etc.)
@@ -32,6 +33,8 @@ A React-based web application for managing marketing campaigns, segments, trigge
   - Geographic targeting
   - MSF (Monthly Service Fee) amount ranges
   - Number of subscribers
+- Interactive filters with data distribution charts
+- Real-time segment size estimation
 
 ### 3. Trigger Management
 - Set up and manage campaign triggers
@@ -174,6 +177,7 @@ Note: The sample data is stored in your browser's local storage. It will persist
 - gh-pages (for deployment)
 - react-query (for API calls and caching)
 - axios (for HTTP requests)
+- Recharts (for data visualization)
 
 ## Project Structure
 

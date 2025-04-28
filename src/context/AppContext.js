@@ -25,28 +25,51 @@ export const AppProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState(() => loadFromLocalStorage('campaigns', []));
   const [triggers, setTriggers] = useState(() => loadFromLocalStorage('triggers', []));
   const [segments, setSegments] = useState(() => loadFromLocalStorage('segments', []));
+  const [availableTables, setAvailableTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState('');
   const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('offerMappings', []));
   const [customerData, setCustomerData] = useState([]);
   const [isBigQueryInitialized, setIsBigQueryInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Initialize with empty arrays if BigQuery fails
+  useEffect(() => {
+    if (!segments || !Array.isArray(segments)) {
+      setSegments([]);
+    }
+  }, [segments]);
+
+  // Initialize BigQuery service and set up periodic data refresh
   useEffect(() => {
     const initializeBigQuery = async () => {
       try {
-        // Initialize BigQuery
-        await dataService.initialize('aipp-tmf680-orch-dev-a613e8', 'camp_mgmt');
+        const projectId = window._env_?.REACT_APP_BQ_PROJECT_ID || process.env.REACT_APP_BQ_PROJECT_ID || 'aipp-tmf680-orch-dev-a613e8';
+        const datasetId = window._env_?.REACT_APP_BQ_DATASET_ID || process.env.REACT_APP_BQ_DATASET_ID || 'camp_mgmt';
         
-        // Set the current table
-        await dataService.setCurrentTable('customer_data');
+        if (!projectId || !datasetId) {
+          console.error('BigQuery project ID or dataset ID not found in environment variables');
+          return;
+        }
+
+        await dataService.initialize(projectId, datasetId);
+        console.log('BigQuery service initialized successfully');
         
-        // Fetch initial customer data
-        const data = await dataService.getCustomerData();
-        setCustomerData(data);
+        // Load available tables
+        const tables = await dataService.listTables();
+        if (tables && Array.isArray(tables)) {
+          setAvailableTables(tables);
+          if (tables.length > 0) {
+            // Set default table and load its data
+            const defaultTable = 'customer_data';
+            setSelectedTable(defaultTable);
+            await loadTableData(defaultTable);
+          }
+        }
         
         setIsBigQueryInitialized(true);
-      } catch (err) {
-        console.error('Error initializing BigQuery:', err);
+      } catch (error) {
+        console.error('Failed to initialize BigQuery service:', error);
         setError('Failed to initialize BigQuery. Some features may not work properly.');
       }
     };
@@ -69,6 +92,31 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     saveToLocalStorage('offerMappings', segmentOfferMappings);
   }, [segmentOfferMappings]);
+
+  const loadTableData = async (tableName) => {
+    try {
+      if (!tableName) {
+        setCustomerData([]);
+        return;
+      }
+
+      const result = await dataService.getTableData(tableName);
+      if (result.success) {
+        setCustomerData(result.data);
+      } else {
+        throw new Error(result.error || 'Failed to fetch table data');
+      }
+    } catch (error) {
+      console.error('Failed to load data from BigQuery:', error);
+      setError(error.message);
+      setCustomerData([]);
+    }
+  };
+
+  const handleTableSelect = async (tableName) => {
+    setSelectedTable(tableName);
+    await loadTableData(tableName);
+  };
 
   const addCampaign = (campaign) => {
     setCampaigns([...campaigns, { ...campaign, id: Date.now() }]);
@@ -177,7 +225,7 @@ export const AppProvider = ({ children }) => {
       filters.root.operator === 'AND' ? ' AND ' : ' OR '
     );
 
-    return `SELECT * FROM \`aipp-tmf680-orch-dev-a613e8.camp_mgmt.customer_data\` WHERE ${whereClause}`;
+    return `SELECT * FROM \`${selectedTable}\` WHERE ${whereClause}`;
   };
 
   const getSegmentById = (id) => {
@@ -214,6 +262,8 @@ export const AppProvider = ({ children }) => {
       isBigQueryInitialized,
       isLoading,
       error,
+      availableTables,
+      selectedTable,
       addCampaign, 
       updateCampaign, 
       addTrigger,
@@ -225,10 +275,12 @@ export const AppProvider = ({ children }) => {
       addSegmentOfferMapping,
       updateSegmentOfferMapping,
       clearAllData,
+      handleTableSelect,
       setCampaigns,
       setTriggers,
       setSegments,
-      setSegmentOfferMappings
+      setSegmentOfferMappings,
+      setError
     }}>
       {children}
     </AppContext.Provider>

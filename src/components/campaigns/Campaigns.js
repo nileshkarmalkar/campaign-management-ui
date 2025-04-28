@@ -102,7 +102,7 @@ const Campaigns = () => {
           variant="contained"
           color="primary"
           onClick={handleAddCampaign}
-          style={{ marginBottom: '20px' }}
+          sx={{ mb: 3 }}
         >
           Add New Campaign
         </Button>

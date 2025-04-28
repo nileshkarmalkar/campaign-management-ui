@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import dataService from '../../services/bigquery';
 import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
-import SegmentForm from './SegmentForm';
+import DynamicSegmentForm from './DynamicSegmentForm';
 
 const Segments = () => {
   const [showForm, setShowForm] = useState(false);
@@ -64,19 +64,24 @@ const Segments = () => {
     setSelectedSegment(null);
   };
 
-  const handleSubmitForm = (formData) => {
+  const handleSubmitForm = useCallback((filters, filteredData, name, description) => {
+    const segmentData = {
+      id: selectedSegment ? selectedSegment.id : `segment-${Date.now()}`,
+      segmentName: name,
+      description: description,
+      status: 'active', // You might want to add a status field to the form
+      filters: filters,
+      filteredAccounts: filteredData.length,
+    };
+
     if (selectedSegment) {
-      updateSegment({ ...formData, id: selectedSegment.id });
+      updateSegment(segmentData);
     } else {
-      const newSegment = {
-        ...formData,
-        id: `segment-${Date.now()}`
-      };
-      addSegment(newSegment);
+      addSegment(segmentData);
     }
     setShowForm(false);
     setSelectedSegment(null);
-  };
+  }, [selectedSegment, updateSegment, addSegment]);
 
   const handleEditSegment = (segment) => {
     setSelectedSegment(segment);
@@ -148,14 +153,14 @@ const Segments = () => {
       {showForm && (
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
           {availableTables.length > 0 ? (
-            <SegmentForm 
+            <DynamicSegmentForm 
               onSubmit={handleSubmitForm} 
               onCancel={handleCancelForm}
-              availableTriggers={triggers}
-              availableSegments={segments}
               availableTables={availableTables}
-              currentSegmentId={selectedSegment?.id}
-              initialData={selectedSegment}
+              initialFilters={selectedSegment?.filters}
+              initialFilteredData={selectedSegment?.filteredAccounts}
+              initialName={selectedSegment?.segmentName}
+              initialDescription={selectedSegment?.description}
             />
           ) : (
             <Typography>No tables available. Please check your BigQuery configuration.</Typography>

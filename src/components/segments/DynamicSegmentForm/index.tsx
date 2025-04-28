@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Typography, Grid, Paper, Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box } from '@mui/material';
+import { Typography, Grid, Paper, Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, TextField } from '@mui/material';
 import { FilterOperator } from './utils/types';
 import { analyzeColumn, generateFilterConfig } from './utils/dataAnalyzer';
 import { ColumnMetadata, FilterConfig, FilterState, FilterGroup, FilterCondition, ComparisonOperator } from './utils/types';
@@ -9,13 +9,17 @@ import FilterPanel from './FilterPanel';
 import dataService from '../../../services/bigquery';
 
 interface DynamicSegmentFormProps {
-  onSubmit: (filters: FilterState, filteredData: Record<string, any>[]) => void;
+  onSubmit: (filters: FilterState, filteredData: Record<string, any>[], name: string, description: string) => void;
   initialFilters?: FilterState;
   initialFilteredData?: Record<string, any>[];
+  initialName?: string;
+  initialDescription?: string;
   availableTables: string[];
 }
 
-const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initialFilters, initialFilteredData, availableTables }) => {
+const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initialFilters, initialFilteredData, initialName, initialDescription, availableTables }) => {
+  const [name, setName] = useState<string>(initialName || '');
+  const [description, setDescription] = useState<string>(initialDescription || '');
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [data, setData] = useState<Record<string, any>[]>([]);
   const [columns, setColumns] = useState<ColumnMetadata[]>([]);
@@ -48,8 +52,8 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
         }
       } catch (err) {
         console.error('Error fetching data:', err);
-        if (selectedTable === 'camp_mgmt') {
-          // If using sample data table, don't show error
+        if (selectedTable === 'customer_data' || selectedTable === 'churn_data') {
+          // If using sample data tables, don't show error
           setError(null);
         } else {
           setError('Failed to fetch data. Please try again.');
@@ -247,11 +251,38 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   };
 
   const handleSubmit = () => {
-    onSubmit(filterState, filteredData);
+    onSubmit(filterState, filteredData, name, description);
   };
 
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          Segment Details
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Segment Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              multiline
+              rows={3}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+      
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom>
           Dynamic Filtering

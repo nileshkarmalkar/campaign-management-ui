@@ -276,7 +276,7 @@ export const clearAllData = () => {
 
 // Sample datasets for BigQuery service
 export const sampleDatasets = {
-  camp_mgmt: [
+  customer_data: [
     { accountId: "ACC001", msf: 75.50, tenure: 24, brand: "TELUS", lineOfBusiness: "Mobility", paymentMode: "Postpaid", accountType: "Consumer", accountSubType: "Individual", numberOfSubscribers: 1, geography: "BC", isActive: true },
     { accountId: "ACC002", msf: 120.75, tenure: 36, brand: "TELUS", lineOfBusiness: "Home Solution", paymentMode: "Postpaid", accountType: "Consumer", accountSubType: "Family", numberOfSubscribers: 3, geography: "ON", isActive: true },
     { accountId: "ACC003", msf: 45.00, tenure: 12, brand: "Koodo", lineOfBusiness: "Mobility", paymentMode: "Prepaid", accountType: "Consumer", accountSubType: "Individual", numberOfSubscribers: 1, geography: "AB", isActive: true },

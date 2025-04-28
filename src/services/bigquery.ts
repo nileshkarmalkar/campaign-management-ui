@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-const API_BASE_URL = 'http://localhost:3003/api/bigquery';
-
-export class DataService {
-  private static instance: DataService | null = null;
-  private currentTable: string | null = null;
-
-  constructor() {
-    if (DataService.instance) {
-      return DataService.instance;
-    }
-    DataService.instance = this;
-  }
-
-  async initialize(projectId: string, datasetId: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/initialize`, {
-=======
 const API_BASE_URL = process.env.REACT_APP_API_URL || (window.location.hostname === 'nileshkarmalkar.github.io' ? null : 'http://localhost:3001');
 
 interface CustomerRecord {
@@ -31,8 +14,19 @@ interface CustomerRecord {
   isActive: boolean;
 }
 
+interface ChurnRecord {
+  accountId: string;
+  churnRisk: string;
+  lastInteraction: string;
+  revenueChange: number;
+  serviceQuality: number;
+  competitorOffers: boolean;
+}
+
 interface SampleDatasets {
-  [key: string]: CustomerRecord[];
+  [key: string]: CustomerRecord[] | ChurnRecord[];
+  customer_data: CustomerRecord[];
+  churn_data: ChurnRecord[];
 }
 
 class DataService {
@@ -44,76 +38,35 @@ class DataService {
     this.projectId = projectId;
     this.dataset = dataset;
 
+    if (!API_BASE_URL) {
+      console.log('No API URL found, using sample data');
+      return;
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/bigquery/initialize`, {
->>>>>>> feature/dynamic-segmentation
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-<<<<<<< HEAD
-      body: JSON.stringify({ projectId, datasetId }),
-    });
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.message || 'Failed to initialize BigQuery');
-=======
       body: JSON.stringify({ projectId, datasetId: dataset }),
     });
 
     if (!response.ok) {
       throw new Error('Failed to initialize BigQuery');
->>>>>>> feature/dynamic-segmentation
     }
   }
 
   async listTables(): Promise<string[]> {
-<<<<<<< HEAD
-    const response = await fetch(`${API_BASE_URL}/tables`);
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch tables');
-    }
-    return result.data;
-  }
-
-  async setCurrentTable(tableName: string): Promise<void> {
-    this.currentTable = tableName;
-  }
-
-  async getCustomerData(limit: number = 1000): Promise<any[]> {
-    if (!this.currentTable) {
-      const tables = await this.listTables();
-      if (tables.length === 0) {
-        throw new Error('No tables available in the dataset');
-      }
-      this.currentTable = tables[0];
-    }
-
-    const response = await fetch(`${API_BASE_URL}/data/${this.currentTable}?limit=${limit}`);
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch customer data');
-    }
-    return result.data;
-  }
-
-  async executeQuery(query: string): Promise<any[]> {
-    const response = await fetch(`${API_BASE_URL}/query`, {
-=======
     if (!API_BASE_URL) {
       console.log('Using sample data');
       return ['customer_data', 'churn_data'];
     }
     try {
-      // First initialize BigQuery with project and dataset
-      await this.initialize(this.projectId, this.dataset);
-      
       const response = await fetch(`${API_BASE_URL}/api/bigquery/tables?projectId=${this.projectId}&dataset=${this.dataset}`);
       if (!response.ok) {
         throw new Error('Failed to fetch tables');
       }
       const result = await response.json();
-      console.log('API response for tables:', result);
       if (result.success && result.data && result.data.length > 0) {
         return result.data;
       }
@@ -158,21 +111,34 @@ class DataService {
   async executeQuery(query: string): Promise<any[]> {
     if (!API_BASE_URL) {
       console.log('Using sample data');
-      return ['customer_data', 'churn_data'];
+      return [];
     }
     const response = await fetch(`${API_BASE_URL}/api/bigquery/query`, {
->>>>>>> feature/dynamic-segmentation
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ query }),
     });
-<<<<<<< HEAD
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to execute query');
+    if (!response.ok) {
+      throw new Error('Failed to execute query');
     }
+    const result = await response.json();
+    return result.data;
+  }
+
+  // Backward compatibility methods
+  async setCurrentTable(tableName: string): Promise<void> {
+    this.currentTable = tableName;
+  }
+
+  async getCustomerData(limit: number = 1000): Promise<any[]> {
+    const result = await this.getTableData('customer_data', limit);
+    return result.data;
+  }
+
+  async getChurnData(): Promise<any[]> {
+    const result = await this.getTableData('churn_data');
     return result.data;
   }
 
@@ -181,55 +147,49 @@ class DataService {
       throw new Error('No table selected. Call setCurrentTable first.');
     }
 
-    const response = await fetch(`${API_BASE_URL}/data/${this.currentTable}/segment`, {
+    if (!API_BASE_URL) {
+      console.log('Using sample data');
+      return [];
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/bigquery/data/${this.currentTable}/segment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ segmentQuery, limit }),
     });
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch customers by segment');
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch customers by segment');
     }
+
+    const result = await response.json();
     return result.data;
   }
 
   async validateQuery(query: string): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/validate`, {
+    if (!API_BASE_URL) {
+      console.log('Using sample data');
+      return { success: true, data: [] };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/bigquery/validate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ query }),
     });
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to validate query');
-    }
-    return result;
-  }
 
-  // Keeping this for backward compatibility
-  async getChurnData(): Promise<any[]> {
-    const response = await fetch(`${API_BASE_URL}/data/churn_data`);
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch churn data');
-    }
-=======
     if (!response.ok) {
-      throw new Error('Failed to execute query');
+      throw new Error('Failed to validate query');
     }
+
     const result = await response.json();
->>>>>>> feature/dynamic-segmentation
-    return result.data;
+    return result;
   }
 }
 
-<<<<<<< HEAD
-export default new DataService();
-=======
 const dataService = new DataService();
 export default dataService;
->>>>>>> feature/dynamic-segmentation

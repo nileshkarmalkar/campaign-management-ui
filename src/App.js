@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { AppProvider } from './context/AppContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
 import Campaigns from './components/campaigns/Campaigns';
 import Segments from './components/segments/Segments';
@@ -21,13 +21,13 @@ import './App.css';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#4B286D', // TELUS purple
+      main: '#4B286D',
       light: '#7C5AA6',
       dark: '#2A1347',
       contrastText: '#FFFFFF'
     },
     secondary: {
-      main: '#2B8000', // TELUS green
+      main: '#2B8000',
       light: '#66B100',
       dark: '#1F5C00',
       contrastText: '#FFFFFF'
@@ -102,6 +102,8 @@ const theme = createTheme({
 });
 
 function App() {
+  console.log('App component rendering');
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} dateLibInstance={dayjs}>
       <ThemeProvider theme={theme}>
@@ -112,24 +114,22 @@ function App() {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route
-                  path="/*"
+                  path="/"
                   element={
                     <ProtectedRoutes>
-                      <Layout>
-                        <Routes>
-                          <Route index element={<Navigate to="/segments" replace />} />
-                          <Route path="segments" element={<Segments />} />
-                          <Route path="campaigns" element={<Campaigns />} />
-                          <Route path="offers" element={<Offers />} />
-                          <Route path="communications" element={<Communications />} />
-                          <Route path="triggers" element={<Triggers />} />
-                          <Route path="segment-offer-mapping" element={<SegmentOfferMapping />} />
-                          <Route path="workflow" element={<CampaignWorkflow />} />
-                        </Routes>
-                      </Layout>
+                      <Layout />
                     </ProtectedRoutes>
                   }
-                />
+                >
+                  <Route index element={<Navigate to="/segments" replace />} />
+                  <Route path="segments" element={<Segments />} />
+                  <Route path="campaigns" element={<Campaigns />} />
+                  <Route path="offers" element={<Offers />} />
+                  <Route path="communications" element={<Communications />} />
+                  <Route path="triggers" element={<Triggers />} />
+                  <Route path="segment-offer-mapping" element={<SegmentOfferMapping />} />
+                  <Route path="workflow" element={<CampaignWorkflow />} />
+                </Route>
               </Routes>
             </Router>
           </AppProvider>

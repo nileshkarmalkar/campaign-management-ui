@@ -18,7 +18,7 @@ interface DataTableProps {
 }
 
 const DataTable: React.FC<DataTableProps> = ({ data, columns }) => {
-  if (!data.length) {
+  if (!data || !Array.isArray(data) || data.length === 0) {
     return (
       <Typography variant="body1" color="textSecondary" align="center">
         No data available
@@ -26,22 +26,39 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns }) => {
     );
   }
 
-  const formatValue = (value: any, type: ColumnMetadata['type']) => {
-    if (value === null || value === undefined) return '-';
-    
-    switch (type) {
-      case 'numeric':
-        return typeof value === 'number' ? value.toLocaleString() : value;
-      case 'boolean':
-        return value ? 'Yes' : 'No';
-      case 'date':
-        return dayjs(value, 'YYYY-MM-DD', true).isValid() 
-          ? dayjs(value).format('MMM D, YYYY')
-          : value;
-      default:
-        return String(value);
+  const formatValue = (value: any): string => {
+    if (value === null || value === undefined) {
+      return '-';
     }
+
+    if (typeof value === 'object') {
+      if (Array.isArray(value)) {
+        return value.map(v => formatValue(v)).join(', ');
+      }
+      if (value instanceof Date) {
+        return dayjs(value).format('MMM D, YYYY');
+      }
+      return JSON.stringify(value);
+    }
+
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+
+    if (typeof value === 'number') {
+      return value.toLocaleString();
+    }
+
+    return String(value);
   };
+
+  const processedData = data.map(row => {
+    const processedRow: Record<string, string> = {};
+    Object.entries(row).forEach(([key, value]) => {
+      processedRow[key] = formatValue(value);
+    });
+    return processedRow;
+  });
 
   return (
     <Paper elevation={2}>
@@ -63,14 +80,14 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, rowIndex) => (
+            {processedData.map((row, rowIndex) => (
               <TableRow
                 key={rowIndex}
                 sx={{ '&:nth-of-type(odd)': { backgroundColor: 'action.hover' } }}
               >
                 {columns.map((column) => (
                   <TableCell key={`${rowIndex}-${column.name}`}>
-                    {formatValue(row[column.name], column.type)}
+                    {row[column.name]}
                   </TableCell>
                 ))}
               </TableRow>

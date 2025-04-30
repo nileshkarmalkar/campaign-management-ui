@@ -45,7 +45,15 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
       try {
         const result = await dataService.getTableData(selectedTable, 1000);
         if (result.success) {
-          setData(result.data);
+          // Ensure data is properly structured
+          const processedData = result.data.map(item => {
+            const processed: Record<string, any> = {};
+            Object.entries(item).forEach(([key, value]) => {
+              processed[key] = value === null || value === undefined ? '' : value;
+            });
+            return processed;
+          });
+          setData(processedData);
           setError(null);
         } else {
           throw new Error(result.error || 'Failed to fetch data');
@@ -68,7 +76,13 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
 
   useEffect(() => {
     if (data.length > 0) {
-      const analyzedColumns = Object.keys(data[0]).map(key => analyzeColumn(key, data.map(item => item[key])));
+      const analyzedColumns: ColumnMetadata[] = Object.keys(data[0]).map(key => ({
+        name: key,
+        type: typeof data[0][key] === 'number' ? 'numeric' :
+              typeof data[0][key] === 'boolean' ? 'boolean' :
+              dayjs(data[0][key], 'YYYY-MM-DD', true).isValid() ? 'date' :
+              'categorical'
+      }));
       setColumns(analyzedColumns);
       
       const configs = analyzedColumns.map(column => generateFilterConfig(column));
@@ -210,13 +224,6 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
           value: filter.value
         }));
 
-      console.log('New filter state:', {
-        field,
-        value,
-        operator,
-        conditions: newConditions
-      });
-
       return {
         root: {
           ...prevState.root,
@@ -227,7 +234,6 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
     });
   };
 
-  // Add a reset button to clear all filters
   const handleResetFilters = () => {
     const initialActiveFilters: FilterState['activeFilters'] = {};
     filterConfigs.forEach(config => {
@@ -326,8 +332,18 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
                 </Select>
               </FormControl>
             </Box>
-            {filteredData.length > 0 ? (
-              <DataTable data={filteredData} columns={columns} />
+            {filteredData.length > 0 && columns.length > 0 ? (
+              <DataTable 
+                data={filteredData.map(row => {
+                  const processedRow: Record<string, string> = {};
+                  columns.forEach(col => {
+                    const value = row[col.name];
+                    processedRow[col.name] = value === null || value === undefined ? '' : String(value);
+                  });
+                  return processedRow;
+                })} 
+                columns={columns} 
+              />
             ) : (
               <Typography variant="body1" color="textSecondary" align="center">
                 No data available

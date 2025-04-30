@@ -33,34 +33,57 @@ class DataService {
   private projectId: string = 'aipp-tmf680-orch-dev-a613e8';
   private dataset: string = 'camp_mgmt';
   private currentTable: string = '';
+  private sampleDatasets: SampleDatasets | null = null;
+
+  private async loadSampleData(): Promise<void> {
+    if (!this.sampleDatasets) {
+      const { sampleDatasets } = await import('../utils/sampleData');
+      this.sampleDatasets = sampleDatasets;
+    }
+  }
 
   async initialize(projectId: string, dataset: string): Promise<void> {
     this.projectId = projectId;
     this.dataset = dataset;
 
-    if (!API_BASE_URL) {
-      console.log('No API URL found, using sample data');
+    // Always load sample data for GitHub Pages
+    if (window.location.hostname === 'nileshkarmalkar.github.io') {
+      await this.loadSampleData();
       return;
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/bigquery/initialize`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ projectId, datasetId: dataset }),
-    });
+    if (!API_BASE_URL) {
+      console.log('No API URL found, using sample data');
+      await this.loadSampleData();
+      return;
+    }
 
-    if (!response.ok) {
-      throw new Error('Failed to initialize BigQuery');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/bigquery/initialize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projectId, datasetId: dataset }),
+      });
+
+      if (!response.ok) {
+        console.log('Failed to initialize BigQuery, falling back to sample data');
+        await this.loadSampleData();
+      }
+    } catch (error) {
+      console.log('Error initializing BigQuery, falling back to sample data:', error);
+      await this.loadSampleData();
     }
   }
 
   async listTables(): Promise<string[]> {
-    if (!API_BASE_URL) {
+    if (window.location.hostname === 'nileshkarmalkar.github.io' || !API_BASE_URL) {
       console.log('Using sample data');
+      await this.loadSampleData();
       return ['customer_data', 'churn_data'];
     }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/bigquery/tables?projectId=${this.projectId}&dataset=${this.dataset}`);
       if (!response.ok) {
@@ -73,61 +96,67 @@ class DataService {
       throw new Error('No tables found in dataset');
     } catch (error) {
       console.log('Error fetching tables, falling back to sample data:', error);
+      await this.loadSampleData();
       return ['customer_data', 'churn_data'];
     }
   }
 
   async getTableData(tableName: string, limit: number = 1000): Promise<{ success: boolean; data: any[]; error?: string }> {
-    if (!API_BASE_URL) {
+    if (window.location.hostname === 'nileshkarmalkar.github.io' || !API_BASE_URL) {
       console.log('Using sample data');
-      const { sampleDatasets } = await import('../utils/sampleData') as { sampleDatasets: SampleDatasets };
+      await this.loadSampleData();
       return {
         success: true,
-        data: sampleDatasets[tableName] || []
+        data: this.sampleDatasets?.[tableName] || []
       };
     }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/bigquery/data/${encodeURIComponent(tableName)}?projectId=${this.projectId}&dataset=${this.dataset}&limit=${limit}`);
       if (!response.ok) {
-        // If API fails, return sample data
-        const { sampleDatasets } = await import('../utils/sampleData') as { sampleDatasets: SampleDatasets };
+        await this.loadSampleData();
         return {
           success: true,
-          data: sampleDatasets[tableName] || []
+          data: this.sampleDatasets?.[tableName] || []
         };
       }
       const result = await response.json();
       return result;
     } catch (error) {
       console.log('Falling back to sample data');
-      const { sampleDatasets } = await import('../utils/sampleData') as { sampleDatasets: SampleDatasets };
+      await this.loadSampleData();
       return {
         success: true,
-        data: sampleDatasets[tableName] || []
+        data: this.sampleDatasets?.[tableName] || []
       };
     }
   }
 
   async executeQuery(query: string): Promise<any[]> {
-    if (!API_BASE_URL) {
-      console.log('Using sample data');
+    if (window.location.hostname === 'nileshkarmalkar.github.io' || !API_BASE_URL) {
+      console.log('Using sample data for query execution');
       return [];
     }
-    const response = await fetch(`${API_BASE_URL}/api/bigquery/query`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query }),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to execute query');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/bigquery/query`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to execute query');
+      }
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.log('Error executing query, returning empty result:', error);
+      return [];
     }
-    const result = await response.json();
-    return result.data;
   }
 
-  // Backward compatibility methods
   async setCurrentTable(tableName: string): Promise<void> {
     this.currentTable = tableName;
   }
@@ -147,47 +176,57 @@ class DataService {
       throw new Error('No table selected. Call setCurrentTable first.');
     }
 
-    if (!API_BASE_URL) {
-      console.log('Using sample data');
+    if (window.location.hostname === 'nileshkarmalkar.github.io' || !API_BASE_URL) {
+      console.log('Using sample data for segment query');
       return [];
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/bigquery/data/${this.currentTable}/segment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ segmentQuery, limit }),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/bigquery/data/${this.currentTable}/segment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ segmentQuery, limit }),
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch customers by segment');
+      if (!response.ok) {
+        throw new Error('Failed to fetch customers by segment');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.log('Error fetching customers by segment, returning empty result:', error);
+      return [];
     }
-
-    const result = await response.json();
-    return result.data;
   }
 
   async validateQuery(query: string): Promise<any> {
-    if (!API_BASE_URL) {
-      console.log('Using sample data');
+    if (window.location.hostname === 'nileshkarmalkar.github.io' || !API_BASE_URL) {
+      console.log('Using sample data for query validation');
       return { success: true, data: [] };
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/bigquery/validate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query }),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/bigquery/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to validate query');
+      if (!response.ok) {
+        throw new Error('Failed to validate query');
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.log('Error validating query, returning success:', error);
+      return { success: true, data: [] };
     }
-
-    const result = await response.json();
-    return result;
   }
 }
 

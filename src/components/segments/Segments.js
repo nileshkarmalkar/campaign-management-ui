@@ -7,7 +7,7 @@ import DynamicSegmentForm from './DynamicSegmentForm';
 
 const Segments = () => {
   const [showForm, setShowForm] = useState(false);
-  const { segments, addSegment, updateSegment, triggers, availableTables, handleTableSelect, loadSampleSegments } = useAppContext();
+  const { segments, addSegment, updateSegment, availableTables, handleTableSelect, loadSampleSegments } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('segmentName');
   const [selectedSegment, setSelectedSegment] = useState(null);

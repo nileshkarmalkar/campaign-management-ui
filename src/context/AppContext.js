@@ -32,7 +32,6 @@ export const AppProvider = ({ children }) => {
   }, []);
   const [availableTables, setAvailableTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState('');
-  const [error, setError] = useState(null);
 
   const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('offerMappings', []));
 
@@ -235,7 +234,6 @@ export const AppProvider = ({ children }) => {
       setTriggers,
       setSegments,
       setSegmentOfferMappings,
-      setError,
       loadSampleData,
       loadSampleCampaigns,
       loadSampleTriggers,

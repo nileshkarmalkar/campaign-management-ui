@@ -190,6 +190,8 @@ const generateCategoricalDistribution = (values: any[]): Record<string, number> 
   }, {} as Record<string, number>);
 };
 
+// This function is kept for future use in advanced analytics features
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const generateNumericBuckets = (
   min: number,
   max: number,

@@ -326,7 +326,13 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
                 </Select>
               </FormControl>
             </Box>
-            <DataTable data={filteredData} columns={columns} />
+            {filteredData.length > 0 ? (
+              <DataTable data={filteredData} columns={columns} />
+            ) : (
+              <Typography variant="body1" color="textSecondary" align="center">
+                No data available
+              </Typography>
+            )}
           </Paper>
         </Grid>
 

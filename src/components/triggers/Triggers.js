@@ -14,7 +14,9 @@ const Triggers = () => {
   const [selectedTrigger, setSelectedTrigger] = useState(null);
 
   const filteredTriggers = useMemo(() => {
+    if (!triggers) return [];
     return triggers.filter(trigger => {
+      if (!trigger) return false;
       const searchValue = trigger[searchField]?.toString().toLowerCase() || '';
       return searchValue.includes(searchTerm.toLowerCase());
     });

@@ -24,17 +24,16 @@ const saveToLocalStorage = (key, value) => {
 export const AppProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState(() => loadFromLocalStorage('campaigns', []));
   const [triggers, setTriggers] = useState(() => loadFromLocalStorage('triggers', []));
-  const [segments, setSegments] = useState(() => loadFromLocalStorage('segments', []));
+  const [segments, setSegments] = useState([]);
+
+  useEffect(() => {
+    const savedSegments = loadFromLocalStorage('segments', []);
+    setSegments(Array.isArray(savedSegments) ? savedSegments : []);
+  }, []);
   const [availableTables, setAvailableTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState('');
   const [error, setError] = useState(null);
 
-  // Initialize with empty arrays if BigQuery fails
-  useEffect(() => {
-    if (!segments || !Array.isArray(segments)) {
-      setSegments([]);
-    }
-  }, [segments]);
   const [segmentOfferMappings, setSegmentOfferMappings] = useState(() => loadFromLocalStorage('offerMappings', []));
 
   useEffect(() => {
@@ -106,6 +105,54 @@ export const AppProvider = ({ children }) => {
     localStorage.removeItem('triggers');
     localStorage.removeItem('segments');
     localStorage.removeItem('offerMappings');
+  };
+
+  const loadSampleData = async () => {
+    await loadSampleCampaigns();
+    await loadSampleTriggers();
+    await loadSampleOffers();
+    console.log('Sample data loaded for Campaigns, Triggers, and Offers');
+  };
+
+  const loadSampleCampaigns = async () => {
+    try {
+      const { sampleCampaigns } = await import('../utils/sampleData');
+      setCampaigns(sampleCampaigns);
+      saveToLocalStorage('campaigns', sampleCampaigns);
+    } catch (error) {
+      console.error('Error loading sample campaigns:', error);
+    }
+  };
+
+  const loadSampleTriggers = async () => {
+    try {
+      const { sampleTriggers } = await import('../utils/sampleData');
+      setTriggers(sampleTriggers);
+      saveToLocalStorage('triggers', sampleTriggers);
+    } catch (error) {
+      console.error('Error loading sample triggers:', error);
+    }
+  };
+
+  const loadSampleOffers = async () => {
+    try {
+      const { sampleOfferMappings } = await import('../utils/sampleData');
+      setSegmentOfferMappings(sampleOfferMappings);
+      saveToLocalStorage('offerMappings', sampleOfferMappings);
+    } catch (error) {
+      console.error('Error loading sample offers:', error);
+    }
+  };
+
+  const loadSampleSegments = async () => {
+    try {
+      const { sampleDatasets } = await import('../utils/sampleData');
+      setSegments(sampleDatasets.customer_data);
+      saveToLocalStorage('segments', sampleDatasets.customer_data);
+      console.log('Sample data loaded for Segments');
+    } catch (error) {
+      console.error('Error loading sample segments:', error);
+    }
   };
 
   // Initialize BigQuery service and set up periodic data refresh
@@ -188,7 +235,12 @@ export const AppProvider = ({ children }) => {
       setTriggers,
       setSegments,
       setSegmentOfferMappings,
-      setError
+      setError,
+      loadSampleData,
+      loadSampleCampaigns,
+      loadSampleTriggers,
+      loadSampleOffers,
+      loadSampleSegments
     }}>
       {children}
     </AppContext.Provider>

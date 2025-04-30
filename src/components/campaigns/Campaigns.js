@@ -19,7 +19,9 @@ const Campaigns = () => {
   const canWrite = checkPermission('write');
 
   const filteredCampaigns = useMemo(() => {
+    if (!campaigns) return [];
     return campaigns.filter(campaign => {
+      if (!campaign) return false;
       const searchValue = campaign[searchField]?.toString().toLowerCase() || '';
       return searchValue.includes(searchTerm.toLowerCase());
     });

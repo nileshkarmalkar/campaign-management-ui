@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import dataService from '../../services/bigquery';
 import { Typography, Button, Grid, Paper, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, Box, IconButton, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,37 +7,37 @@ import DynamicSegmentForm from './DynamicSegmentForm';
 
 const Segments = () => {
   const [showForm, setShowForm] = useState(false);
-  const { segments, addSegment, updateSegment, triggers } = useAppContext();
+  const { segments, addSegment, updateSegment, triggers, availableTables, handleTableSelect, loadSampleSegments } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('segmentName');
   const [selectedSegment, setSelectedSegment] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [availableTables, setAvailableTables] = useState([]);
   const [error, setError] = useState(null);
 
-  const fetchTables = async () => {
-    try {
+  useEffect(() => {
+    const initializeSegments = async () => {
       setIsLoading(true);
-      setError(null);
-      const result = await dataService.listTables();
-      console.log('Fetched tables:', result);
-      if (result && result.length > 0) {
-        setAvailableTables(result);
-      } else {
-        console.log('No tables found, using sample data');
-        setAvailableTables(['camp_mgmt']);
+      try {
+        if (availableTables.length === 0) {
+          await loadSampleSegments();
+        } else {
+          await handleTableSelect(availableTables[0]);
+        }
+      } catch (error) {
+        console.error('Failed to initialize segments:', error);
+        setError('Failed to load segments. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Failed to fetch tables:', error);
-      console.log('Falling back to sample data');
-      setAvailableTables(['camp_mgmt']);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    initializeSegments();
+  }, [availableTables, handleTableSelect, loadSampleSegments]);
 
   const filteredSegments = useMemo(() => {
+    if (!segments) return [];
     return segments.filter(segment => {
+      if (!segment) return false;
       const searchValue = segment[searchField]?.toString().toLowerCase() || '';
       return searchValue.includes(searchTerm.toLowerCase());
     });
@@ -53,9 +52,8 @@ const Segments = () => {
     setSearchTerm('');
   };
 
-  const handleAddSegment = async () => {
+  const handleAddSegment = () => {
     setSelectedSegment(null);
-    await fetchTables();
     setShowForm(true);
   };
 

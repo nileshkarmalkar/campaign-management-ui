@@ -18,7 +18,7 @@ import {
   SvgIcon
 } from '@mui/material';
 import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline, CloudDownload } from '@mui/icons-material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -43,6 +43,7 @@ const Layout = ({ children }) => {
   const { clearAllData, loadSampleData } = useAppContext();
   const { currentUser, checkPermission } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
+  const location = useLocation();
 
   const handleClearData = () => {
     setOpenDialog(true);
@@ -74,15 +75,17 @@ const Layout = ({ children }) => {
           </Typography>
           {checkPermission('modify') && (
             <>
-              <Button
-                color="primary"
-                startIcon={<CloudDownload />}
-                onClick={handleLoadSampleData}
-                variant="contained"
-                sx={{ ml: 2 }}
-              >
-                Load Sample Data
-              </Button>
+              {location.pathname !== '/segments' && (
+                <Button
+                  color="primary"
+                  startIcon={<CloudDownload />}
+                  onClick={handleLoadSampleData}
+                  variant="contained"
+                  sx={{ ml: 2 }}
+                >
+                  Load Sample Data
+                </Button>
+              )}
               <Button
                 color="secondary"
                 startIcon={<DeleteOutline />}

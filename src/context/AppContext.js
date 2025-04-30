@@ -198,7 +198,6 @@ export const AppProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to load data from BigQuery:', error);
-      setError(error.message);
       setSegments([]);
       saveToLocalStorage('segments', []);
     }

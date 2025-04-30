@@ -64,24 +64,24 @@ const telusTheme = {
 const genericTheme = {
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
+      main: '#616161',
+      light: '#9E9E9E',
+      dark: '#424242',
       contrastText: '#FFFFFF'
     },
     secondary: {
-      main: '#9c27b0',
-      light: '#ba68c8',
-      dark: '#7b1fa2',
+      main: '#757575',
+      light: '#BDBDBD',
+      dark: '#616161',
       contrastText: '#FFFFFF'
     },
     background: {
-      default: '#f5f5f5',
-      paper: '#ffffff'
+      default: '#F5F5F5',
+      paper: '#FFFFFF'
     },
     text: {
-      primary: '#333333',
-      secondary: '#666666'
+      primary: '#212121',
+      secondary: '#757575'
     }
   },
   typography: {
@@ -89,32 +89,32 @@ const genericTheme = {
     h1: {
       fontSize: '2.75rem',
       fontWeight: 300,
-      color: '#333333'
+      color: '#212121'
     },
     h2: {
       fontSize: '2rem',
       fontWeight: 400,
-      color: '#333333'
+      color: '#212121'
     },
     h3: {
       fontSize: '1.75rem',
       fontWeight: 400,
-      color: '#333333'
+      color: '#212121'
     },
     h4: {
       fontSize: '1.5rem',
       fontWeight: 400,
-      color: '#333333'
+      color: '#212121'
     },
     h5: {
       fontSize: '1.25rem',
       fontWeight: 400,
-      color: '#333333'
+      color: '#212121'
     },
     h6: {
       fontSize: '1.125rem',
       fontWeight: 500,
-      color: '#333333'
+      color: '#212121'
     }
   }
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, Link as RouterLink } from 'react-router-dom';
+import { Outlet, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { 
   Box, 
   AppBar, 
@@ -16,10 +16,9 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-  Alert,
-  SvgIcon
+  Alert
 } from '@mui/material';
-import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline, CloudDownload } from '@mui/icons-material';
+import { Campaign, Segment, LocalOffer, Message, NotificationsActive, WorkOutline, DeleteOutline, CloudDownload, ExitToApp } from '@mui/icons-material';
 import { useAppContext } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -35,17 +34,12 @@ const menuItems = [
   { text: 'Communications', icon: <Message />, path: '/communications', requiredPermission: 'write' },
 ];
 
-const TelusLogo = (props) => (
-  <SvgIcon {...props} viewBox="0 0 400 80">
-    <text x="10" y="60" fontFamily="Arial Black" fontSize="60" fill="#4B286D">TELUS</text>
-  </SvgIcon>
-);
-
 const Layout = () => {
   const { clearAllData, loadSampleData, error, isBigQueryInitialized } = useAppContext();
-  const { currentUser, checkPermission } = useAuth();
+  const { currentUser, checkPermission, logout } = useAuth();
   const { useBranding } = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
+  const navigate = useNavigate();
 
   const handleClearData = () => {
     setOpenDialog(true);
@@ -64,11 +58,15 @@ const Layout = () => {
     loadSampleData();
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
-          {useBranding && <TelusLogo sx={{ fontSize: 40, mr: 2 }} />}
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Campaign Management
           </Typography>
@@ -95,6 +93,14 @@ const Layout = () => {
               </Button>
             </>
           )}
+          <Button
+            color="inherit"
+            startIcon={<ExitToApp />}
+            onClick={handleLogout}
+            sx={{ ml: 2 }}
+          >
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer

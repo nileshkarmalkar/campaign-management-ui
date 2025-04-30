@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import dataService from '../services/bigquery.ts';
+import { sampleDatasets } from '../utils/sampleData';
 
 const AppContext = createContext();
 
@@ -110,6 +111,83 @@ export const AppProvider = ({ children }) => {
       console.error('Failed to load data from BigQuery:', error);
       setError(error.message);
       setCustomerData([]);
+    }
+  };
+
+  const loadSampleData = () => {
+    try {
+      // Load sample customer data
+      setCustomerData(sampleDatasets.customer_data);
+      
+      // Create sample segments based on the data
+      const sampleSegments = [
+        {
+          id: Date.now(),
+          name: 'High Value Customers',
+          description: 'Customers with MSF > 100',
+          filters: {
+            root: {
+              operator: 'AND',
+              conditions: [
+                { field: 'msf', operator: '>', value: 100 }
+              ]
+            }
+          },
+          filteredAccounts: sampleDatasets.customer_data.filter(customer => customer.msf > 100)
+        },
+        {
+          id: Date.now() + 1,
+          name: 'Long Term Customers',
+          description: 'Customers with tenure > 24 months',
+          filters: {
+            root: {
+              operator: 'AND',
+              conditions: [
+                { field: 'tenure', operator: '>', value: 24 }
+              ]
+            }
+          },
+          filteredAccounts: sampleDatasets.customer_data.filter(customer => customer.tenure > 24)
+        }
+      ];
+
+      // Create sample campaigns
+      const sampleCampaigns = [
+        {
+          id: Date.now() + 2,
+          name: 'Retention Campaign',
+          description: 'Campaign for retaining high-value customers',
+          startDate: new Date().toISOString(),
+          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'Active'
+        }
+      ];
+
+      // Create sample triggers
+      const sampleTriggers = [
+        {
+          id: Date.now() + 3,
+          name: 'High Churn Risk Alert',
+          description: 'Trigger for customers with high churn risk',
+          condition: 'churnRisk === "High"',
+          action: 'Send retention offer'
+        }
+      ];
+
+      // Update state with sample data
+      setSegments(sampleSegments);
+      setCampaigns(sampleCampaigns);
+      setTriggers(sampleTriggers);
+      setError(null);
+
+      // Save to localStorage
+      saveToLocalStorage('segments', sampleSegments);
+      saveToLocalStorage('campaigns', sampleCampaigns);
+      saveToLocalStorage('triggers', sampleTriggers);
+
+    } catch (error) {
+      console.error('Error loading sample data:', error);
+      setError('Failed to load sample data. Please try again.');
     }
   };
 
@@ -275,6 +353,7 @@ export const AppProvider = ({ children }) => {
       addSegmentOfferMapping,
       updateSegmentOfferMapping,
       clearAllData,
+      loadSampleData,
       handleTableSelect,
       setCampaigns,
       setTriggers,

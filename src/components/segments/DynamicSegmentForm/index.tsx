@@ -31,6 +31,20 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize data with initialFilteredData if provided
+  useEffect(() => {
+    if (initialFilteredData && Array.isArray(initialFilteredData) && initialFilteredData.length > 0) {
+      const processedData = initialFilteredData.map(item => {
+        const processed: Record<string, any> = {};
+        Object.entries(item).forEach(([key, value]) => {
+          processed[key] = value === null || value === undefined ? '' : value;
+        });
+        return processed;
+      });
+      setData(processedData);
+    }
+  }, [initialFilteredData]);
+
   useEffect(() => {
     if (availableTables.length > 0 && !selectedTable) {
       setSelectedTable(availableTables[0]);
@@ -39,13 +53,12 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!selectedTable) return;
+      if (!selectedTable || initialFilteredData) return;
       setIsLoading(true);
       setError(null);
       try {
         const result = await dataService.getTableData(selectedTable, 1000);
         if (result.success) {
-          // Ensure data is properly structured
           const processedData = result.data.map(item => {
             const processed: Record<string, any> = {};
             Object.entries(item).forEach(([key, value]) => {
@@ -61,7 +74,6 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
       } catch (err) {
         console.error('Error fetching data:', err);
         if (selectedTable === 'customer_data' || selectedTable === 'churn_data') {
-          // If using sample data tables, don't show error
           setError(null);
         } else {
           setError('Failed to fetch data. Please try again.');
@@ -72,7 +84,7 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
     };
 
     fetchData();
-  }, [selectedTable]);
+  }, [selectedTable, initialFilteredData]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -88,16 +100,18 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
       const configs = analyzedColumns.map(column => generateFilterConfig(column));
       setFilterConfigs(configs);
 
-      const initialActiveFilters: FilterState['activeFilters'] = {};
-      configs.forEach(config => {
-        initialActiveFilters[config.field] = { type: config.type, value: null, operator: '=' };
-      });
-      setFilterState(prevState => ({
-        ...prevState,
-        activeFilters: initialActiveFilters
-      }));
+      if (!initialFilters) {
+        const initialActiveFilters: FilterState['activeFilters'] = {};
+        configs.forEach(config => {
+          initialActiveFilters[config.field] = { type: config.type, value: null, operator: '=' };
+        });
+        setFilterState(prevState => ({
+          ...prevState,
+          activeFilters: initialActiveFilters
+        }));
+      }
     }
-  }, [data]);
+  }, [data, initialFilters]);
 
   const evaluateCondition = useCallback(
     (row: Record<string, any>, condition: FilterCondition | FilterGroup): boolean => {
@@ -180,6 +194,8 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   );
 
   const filteredData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    
     return data.filter(row => 
       filterState.root.operator === 'AND'
         ? filterState.root.conditions.every(condition => evaluateCondition(row, condition))
@@ -192,7 +208,6 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
       const currentFilter = prevState.activeFilters[field];
       let newActiveFilters = { ...prevState.activeFilters };
 
-      // If operator is changing, reset the value
       if (operator !== currentFilter.operator) {
         newActiveFilters[field] = {
           ...currentFilter,
@@ -201,7 +216,6 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
           type: currentFilter.type
         };
       } else {
-        // If value is changing, keep the current operator
         newActiveFilters[field] = {
           ...currentFilter,
           value: value,
@@ -210,7 +224,6 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
         };
       }
 
-      // Build conditions from active filters
       const newConditions = Object.entries(newActiveFilters)
         .filter(([, filter]) => {
           if (filter.value === null) return false;
@@ -259,6 +272,19 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
   const handleSubmit = () => {
     onSubmit(filterState, filteredData, name, description);
   };
+
+  const processedFilteredData = useMemo(() => {
+    return filteredData.map(row => {
+      const processedRow: Record<string, string> = {};
+      if (columns.length > 0) {
+        columns.forEach(col => {
+          const value = row[col.name];
+          processedRow[col.name] = value === null || value === undefined ? '' : String(value);
+        });
+      }
+      return processedRow;
+    });
+  }, [filteredData, columns]);
 
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
@@ -332,16 +358,9 @@ const DynamicSegmentForm: React.FC<DynamicSegmentFormProps> = ({ onSubmit, initi
                 </Select>
               </FormControl>
             </Box>
-            {filteredData.length > 0 && columns.length > 0 ? (
+            {processedFilteredData.length > 0 && columns.length > 0 ? (
               <DataTable 
-                data={filteredData.map(row => {
-                  const processedRow: Record<string, string> = {};
-                  columns.forEach(col => {
-                    const value = row[col.name];
-                    processedRow[col.name] = value === null || value === undefined ? '' : String(value);
-                  });
-                  return processedRow;
-                })} 
+                data={processedFilteredData}
                 columns={columns} 
               />
             ) : (

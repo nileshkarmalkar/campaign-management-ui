@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/campaign-management-ui/static/css/main.0ed19d0b.css",
-    "main.js": "/campaign-management-ui/static/js/main.41c74e14.js",
-    "static/js/478.3d8a813a.chunk.js": "/campaign-management-ui/static/js/478.3d8a813a.chunk.js",
+    "main.js": "/campaign-management-ui/static/js/main.324b521b.js",
+    "static/js/478.1c6e31bc.chunk.js": "/campaign-management-ui/static/js/478.1c6e31bc.chunk.js",
     "static/js/453.88cddbf3.chunk.js": "/campaign-management-ui/static/js/453.88cddbf3.chunk.js",
     "index.html": "/campaign-management-ui/index.html",
     "main.0ed19d0b.css.map": "/campaign-management-ui/static/css/main.0ed19d0b.css.map",
-    "main.41c74e14.js.map": "/campaign-management-ui/static/js/main.41c74e14.js.map",
-    "478.3d8a813a.chunk.js.map": "/campaign-management-ui/static/js/478.3d8a813a.chunk.js.map",
+    "main.324b521b.js.map": "/campaign-management-ui/static/js/main.324b521b.js.map",
+    "478.1c6e31bc.chunk.js.map": "/campaign-management-ui/static/js/478.1c6e31bc.chunk.js.map",
     "453.88cddbf3.chunk.js.map": "/campaign-management-ui/static/js/453.88cddbf3.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0ed19d0b.css",
-    "static/js/main.41c74e14.js"
+    "static/js/main.324b521b.js"
   ]
 }
